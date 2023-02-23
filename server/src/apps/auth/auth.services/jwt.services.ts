@@ -16,7 +16,6 @@ export const validateAccessToken = (token: string) => {
   if (!token) return false;
   try {
     const decoded = jwt.verify(token, env.getAccessSecret());
-    console.log(decoded);
     return true;
   } catch {
     return false;
@@ -26,7 +25,6 @@ export const validateRefreshToken = (token: string) => {
   if (!token) return false;
   try {
     const decoded = jwt.verify(token, env.getRefreshTokenSecret());
-    console.log(decoded);
     return true;
   } catch (err) {
     return false;

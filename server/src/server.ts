@@ -5,6 +5,7 @@ import env from "./core/env";
 import _404 from "./core/middlewares/404.middleware";
 import _500 from "./core/middlewares/500.middleware";
 import cookieParser from "cookie-parser";
+import morgan from "morgan";
 
 const server = async () => {
   const app = express();
@@ -21,6 +22,7 @@ const registerApps = (app: Express) => {
   app.use("/api/v1/accounts", accountsRouter);
 };
 const registerMiddlewares = (app: Express) => {
+  app.use(morgan("dev"));
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
   app.use(cookieParser(env.getCookieSecretKey()));
