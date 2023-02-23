@@ -4,6 +4,7 @@ import { authRouter } from "./apps/auth/auth.routes";
 import env from "./core/env";
 import _404 from "./core/middlewares/404.middleware";
 import _500 from "./core/middlewares/500.middleware";
+import cookieParser from "cookie-parser";
 
 const server = async () => {
   const app = express();
@@ -22,6 +23,7 @@ const registerApps = (app: Express) => {
 const registerMiddlewares = (app: Express) => {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
+  app.use(cookieParser(env.getCookieSecretKey()));
 };
 const registerErrorsMiddlewares = (app: Express) => {
   app.use(_404);

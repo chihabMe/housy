@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 import { accessTokenMaxAge, refreshTokenMaxAge } from "../../../core/constants";
 import env from "../../../core/env";
 
-export const generateTokens = (user_id: string) => {
+export const generateAuthTokens = (user_id: string) => {
   const accessToken = jwt.sign({ user_id }, env.getAccessSecret(), {
     expiresIn: accessTokenMaxAge,
   });
@@ -13,12 +13,17 @@ export const generateTokens = (user_id: string) => {
 };
 
 export const validateAccessToken = (token: string) => {
-  return jwt.verify(token, env.getAccessSecret(), (err, decoded) => {
-    if (err) return false;
+  if (!token) return false;
+  try {
+    const decoded = jwt.verify(token, env.getAccessSecret());
+    console.log(decoded);
     return true;
-  });
+  } catch {
+    return false;
+  }
 };
 export const validateRefreshToken = (token: string) => {
+  if (!token) return false;
   try {
     const decoded = jwt.verify(token, env.getRefreshTokenSecret());
     console.log(decoded);

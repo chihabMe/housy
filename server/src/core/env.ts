@@ -1,4 +1,12 @@
+import { config } from "dotenv";
+config();
 const PORT = process.env.PORT ?? 3001;
+export const getCookieSecretKey = () => {
+  const secret = process.env.COOKIE_SECRET;
+  if (!secret)
+    throw new Error("please provide a COOKIE_SECRET as env variable");
+  return secret;
+};
 const isProduction = () => {
   return process.env.MODE == "PRODUCTION";
 };
@@ -20,4 +28,5 @@ export default {
   isProduction,
   getRefreshTokenSecret,
   getAccessSecret,
+  getCookieSecretKey,
 };
