@@ -1,14 +1,16 @@
 import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status";
 import { ACCESS_COOKIE_NAME, REFRESH_COOKIE_NAME } from "../../core/constants";
+import redis_client from "../../core/redis_clinet";
 import { generateAuthTokens, setAuthCookies } from "./auth.services";
 
-export const obtainTokenHandler = (
+export const obtainTokenHandler = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
   const tokens = generateAuthTokens("hihsdfsdf");
+  redis_client.set("hi", "hello");
   setAuthCookies({
     res,
     access: tokens.accessToken,
