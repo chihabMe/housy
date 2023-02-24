@@ -23,10 +23,21 @@ const getAccessSecret = () => {
   return secret;
 };
 
+export const getRedisURL = () => {
+  const host = process.env.REDIS_HOST;
+  const port = process.env.REDIS_PORT;
+  const password = process.env.REDIS_PASSWORD;
+  const username = process.env.REDIS_USERNAME;
+  if (!host || !port || !password || !username)
+    throw new Error("please check your redis env variables");
+  return `redis://${username}:${password}@${host}:${port}`;
+};
+
 export default {
   PORT,
   isProduction,
   getRefreshTokenSecret,
   getAccessSecret,
   getCookieSecretKey,
+  getRedisURL,
 };
