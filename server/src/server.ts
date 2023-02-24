@@ -1,4 +1,5 @@
 import express, { Express } from "express";
+import { accountsRouter } from "./apps/accounts/accounts.routes";
 import { authRouter } from "./apps/auth/auth.routes";
 import env from "./core/env";
 import _404 from "./core/middlewares/404.middleware";
@@ -16,6 +17,7 @@ const server = async () => {
 
 const registerApps = (app: Express) => {
   app.use("/api/v1/auth", authRouter);
+  app.use("/api/v1/accounts", accountsRouter);
 };
 const registerMiddlewares = (app: Express) => {
   app.use(express.json());

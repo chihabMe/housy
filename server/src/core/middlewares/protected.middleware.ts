@@ -1,6 +1,11 @@
 import { Request, Response, NextFunction } from "express";
 
-const protectedRoute = (req: Request, res: Response, next: NextFunction) => {
+const protectedRouteMiddleware = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+    console.log("run protected")
   next();
 };
-export default protectedRoute;
+export default protectedRouteMiddleware;
