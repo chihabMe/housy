@@ -10,11 +10,11 @@ import {
 
 export const authRouter = Router();
 
-authRouter.get(
+authRouter.post(
   "/token/obtain",
   zodValidatorMiddleware(loginSchema),
   obtainTokenHandler
 );
-authRouter.get("/token/refresh", refreshTokenHandler);
-authRouter.get("/token/verify", verifyTokenHandler);
-authRouter.get("/token/logout", logoutTokenHandler);
+authRouter.post("/token/refresh", refreshTokenHandler);
+authRouter.post("/token/verify", verifyTokenHandler);
+authRouter.post("/token/logout", logoutTokenHandler);

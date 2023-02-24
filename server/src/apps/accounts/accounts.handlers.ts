@@ -1,8 +1,18 @@
 import { Request, Response, NextFunction } from "express";
+import { TypeOf } from "zod";
 import httpStatus from "http-status";
+import { registrationSchema } from "../../lib/schemas/auth/registration.schemas";
+import prisma from "../../core/prisma";
+export const accountsRegisterHandler = async (
+  req: Request<{}, {}, TypeOf<typeof registrationSchema>>,
+  res: Response
+) => {
+  const data = req.body;
+  const user = await prisma.user.create({
+    data,
+  });
 
-export const accountsRegisterHandler = (req: Request, res: Response) => {
-  res.status(httpStatus.CREATED).json("created");
+  res.status(httpStatus.CREATED).json({username:user.username,email:user.email});
 };
 export const accountsMeHandler = (req: Request, res: Response) => {
   res.status(httpStatus.OK).json("me");
