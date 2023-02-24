@@ -3,16 +3,27 @@ import { TypeOf } from "zod";
 import httpStatus from "http-status";
 import { registrationSchema } from "../../lib/schemas/auth/registration.schemas";
 import prisma from "../../core/prisma";
+import { hasher } from "../../lib/hasher";
 export const accountsRegisterHandler = async (
   req: Request<{}, {}, TypeOf<typeof registrationSchema>>,
-  res: Response
+  res: Response,
+  next: NextFunction
 ) => {
-  const data = req.body;
-  const user = await prisma.user.create({
-    data,
-  });
-
-  res.status(httpStatus.CREATED).json({username:user.username,email:user.email});
+  const { email, password, username } = req.body;
+  try {
+    const user = await prisma.user.create({
+      data: {
+        email,
+        username,
+        password: hasher(password),
+      },
+    });
+    res
+      .status(httpStatus.CREATED)
+      .json({ username: user.username, email: user.email });
+  } catch (err) {
+    next(err);
+  }
 };
 export const accountsMeHandler = (req: Request, res: Response) => {
   res.status(httpStatus.OK).json("me");
