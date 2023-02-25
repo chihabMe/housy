@@ -9,13 +9,18 @@ import {
   registrationSchema,
 } from "../../libs/schemas/accounts";
 import bcrypt from "bcrypt";
+import { sendAccountActivationEmail, sendMail } from "../../libs/email";
 export const accountsRegisterHandler = async (
   req: Request<{}, {}, TypeOf<typeof registrationSchema>>,
   res: Response,
   next: NextFunction
 ) => {
+  //(this route is being validated by zod validator middleware)
+  //so those values are insured to be  stored in the req.body
+  //extracting the registration fields
   const { email, password, username } = req.body;
   try {
+    //save the user in the database
     const user = await prisma.user.create({
       data: {
         email,
@@ -23,10 +28,18 @@ export const accountsRegisterHandler = async (
         password: hasher(password),
       },
     });
+    //send confirmation email to the user email
+    sendAccountActivationEmail({
+      subject: "account activation email",
+      text: "please confirm your email",
+      to: email,
+    });
+    //return success status and the user data
     res
       .status(httpStatus.CREATED)
-      .json({ username: user.username, email: user.email });
+      .json({ username: user.username, email: user.email, id: user.id });
   } catch (err) {
+    //pass the error to the 500 errors handler middleware
     next(err);
   }
 };

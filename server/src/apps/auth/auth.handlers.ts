@@ -10,6 +10,8 @@ import {
   validateRefreshToken,
 } from "./auth.services";
 import bcrypt from "bcrypt";
+import { sendMail } from "../../libs/email";
+import env from "../../core/env";
 
 export const obtainTokenHandler = async (
   req: Request<{}, {}, { email: string; password: string }>,

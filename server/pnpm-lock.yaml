@@ -8,6 +8,7 @@ specifiers:
   '@types/jsonwebtoken': ^9.0.1
   '@types/morgan': ^1.9.4
   '@types/node': ^18.14.0
+  '@types/nodemailer': ^6.4.7
   '@types/redis': ^4.0.11
   bcrypt: ^5.1.0
   cookie-parser: ^1.4.6
@@ -16,6 +17,7 @@ specifiers:
   http-status: ^1.6.2
   jsonwebtoken: ^9.0.0
   morgan: ^1.10.0
+  nodemailer: ^6.9.1
   nodemon: ^2.0.20
   prisma: ^4.10.1
   redis: ^4.6.4
@@ -32,6 +34,7 @@ dependencies:
   http-status: 1.6.2
   jsonwebtoken: 9.0.0
   morgan: 1.10.0
+  nodemailer: 6.9.1
   nodemon: 2.0.20
   redis: 4.6.4
   ts-node: 10.9.1_tncu2ai53lzgmizdedur7lbibe
@@ -45,6 +48,7 @@ devDependencies:
   '@types/jsonwebtoken': 9.0.1
   '@types/morgan': 1.9.4
   '@types/node': 18.14.0
+  '@types/nodemailer': 6.4.7
   '@types/redis': 4.0.11
   prisma: 4.10.1
 
@@ -232,6 +236,12 @@ packages:
 
   /@types/node/18.14.0:
     resolution: {integrity: sha512-5EWrvLmglK+imbCJY0+INViFWUHg1AHel1sq4ZVSfdcNqGy9Edv3UB9IIzzg+xPaUcAgZYcfVs2fBcwDeZzU0A==}
+
+  /@types/nodemailer/6.4.7:
+    resolution: {integrity: sha512-f5qCBGAn/f0qtRcd4SEn88c8Fp3Swct1731X4ryPKqS61/A3LmmzN8zaEz7hneJvpjFbUUgY7lru/B/7ODTazg==}
+    dependencies:
+      '@types/node': 18.14.0
+    dev: true
 
   /@types/qs/6.9.7:
     resolution: {integrity: sha512-FGa1F62FT09qcrueBA6qYTrJPVDzah9a+493+o2PCXsesWHIn27G98TsSMs3WPNbZIEj4+VJf6saSFpvD+3Zsw==}
@@ -962,6 +972,11 @@ packages:
         optional: true
     dependencies:
       whatwg-url: 5.0.0
+    dev: false
+
+  /nodemailer/6.9.1:
+    resolution: {integrity: sha512-qHw7dOiU5UKNnQpXktdgQ1d3OFgRAekuvbJLcdG5dnEo/GtcTHRYM7+UfJARdOFU9WUQO8OiIamgWPmiSFHYAA==}
+    engines: {node: '>=6.0.0'}
     dev: false
 
   /nodemon/2.0.20:

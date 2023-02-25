@@ -32,6 +32,20 @@ export const getRedisURL = () => {
     throw new Error("please check your redis env variables");
   return `redis://${username}:${password}@${host}:${port}`;
 };
+const getEmailConfig = () => {
+  const host = process.env.EMAIL_HOST;
+  const username = process.env.EMAIL_USERNAME;
+  const port = process.env.EMAIL_PORT;
+  const password = process.env.EMAIL_SECRET;
+  if (!host || !password || !port || !username)
+    throw new Error("please check your email env variables");
+  return {
+    host,
+    password,
+    username,
+    port: Number.parseInt(port),
+  };
+};
 
 export default {
   PORT,
@@ -40,4 +54,5 @@ export default {
   getAccessSecret,
   getCookieSecretKey,
   getRedisURL,
+  getEmailConfig,
 };
