@@ -1,8 +1,9 @@
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import { accessTokenMaxAge, refreshTokenMaxAge } from "../../../core/constants";
 import env from "../../../core/env";
 
 export const generateAuthTokens = (user_id: string) => {
+  console.log(accessTokenMaxAge);
   const accessToken = jwt.sign({ user_id }, env.getAccessSecret(), {
     expiresIn: accessTokenMaxAge,
   });
@@ -13,20 +14,26 @@ export const generateAuthTokens = (user_id: string) => {
 };
 
 export const validateAccessToken = (token: string) => {
-  if (!token) return false;
+  if (!token) return null;
   try {
     const decoded = jwt.verify(token, env.getAccessSecret());
-    return true;
+    return decoded;
   } catch {
-    return false;
+    return null;
   }
 };
-export const validateRefreshToken = (token: string) => {
-  if (!token) return false;
+export const validateRefreshToken = (
+  token: string
+): refreshTokenDataType | null => {
+  if (!token) return null;
   try {
-    const decoded = jwt.verify(token, env.getRefreshTokenSecret());
-    return true;
+    const decoded = jwt.verify(
+      token,
+      env.getRefreshTokenSecret()
+    ) as refreshTokenDataType;
+    return decoded;
   } catch (err) {
-    return false;
+    return null;
   }
 };
+type refreshTokenDataType = JwtPayload & { user_id: string };
