@@ -79,13 +79,31 @@ export const refreshTokenHandler = async (
   }
 };
 export const verifyTokenHandler = (req: Request, res: Response) => {
+  //get the access token from the header or the cookie
   const token = (req.headers[ACCESS_COOKIE_NAME] ??
     req.signedCookies[ACCESS_COOKIE_NAME]) as string;
-  if (!token || !validateAccessToken(token))
-    return res.status(httpStatus.BAD_REQUEST).json("invalid access token");
 
+  //if there is no token or the token is invalid return 400 error invalid token
+  if (!validateAccessToken(token))
+    return res.status(httpStatus.BAD_REQUEST).json("invalid access token");
+  //else
+  //return success status
   return res.status(httpStatus.OK).json();
 };
-export const logoutTokenHandler = (req: Request, res: Response) => {
-  return res.status(httpStatus.OK).json("logout");
+export const logoutTokenHandler = async (req: Request, res: Response) => {
+  //get the refresh token from the header or the cookie
+  const refresh = (req.headers[REFRESH_COOKIE_NAME] ??
+    req.signedCookies[REFRESH_COOKIE_NAME]) as string;
+  //if there is no token or the token is invalid return 400 error invalid refresh token
+  const decoded = validateRefreshToken(refresh);
+  if (!decoded)
+    return res.status(httpStatus.BAD_REQUEST).json("invalid refresh token");
+  //if the refresh token is valid
+  //delete it from redis by using the user_id as a key
+  await redis_client.del(decoded.user_id);
+  //delete the auth cookies
+  res.clearCookie(REFRESH_COOKIE_NAME);
+  res.clearCookie(ACCESS_COOKIE_NAME);
+  //return a success response
+  return res.status(httpStatus.OK).json("logged out");
 };
