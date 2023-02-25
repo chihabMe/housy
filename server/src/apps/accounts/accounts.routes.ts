@@ -1,7 +1,10 @@
 import { Router } from "express";
 import protectedRouteMiddleware from "../../core/middlewares/protected.middleware";
 import { zodValidatorMiddleware } from "../../core/middlewares/zod.middleware";
-import { registrationSchema } from "../../libs/schemas/auth/registration.schemas";
+import {
+  passwordChangeSchema,
+  registrationSchema,
+} from "../../libs/schemas/accounts";
 import {
   accountsActivateHandler,
   accountsChangeEmailHandler,
@@ -33,8 +36,9 @@ accountsRouter.get(
   protectedRouteMiddleware,
   accountsChangeEmailHandler
 );
-accountsRouter.get(
+accountsRouter.post(
   "/change/password",
   protectedRouteMiddleware,
+  zodValidatorMiddleware(passwordChangeSchema),
   accountsChangePassword
 );
