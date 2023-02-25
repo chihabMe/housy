@@ -1,9 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 import { TypeOf } from "zod";
 import httpStatus from "http-status";
-import { registrationSchema } from "../../lib/schemas/auth/registration.schemas";
+import { registrationSchema } from "../../libs/schemas/auth/registration.schemas";
 import prisma from "../../core/prisma";
-import { hasher } from "../../lib/hasher";
+import { hasher } from "../../libs/hasher";
+import { User } from "@prisma/client";
 export const accountsRegisterHandler = async (
   req: Request<{}, {}, TypeOf<typeof registrationSchema>>,
   res: Response,
@@ -26,7 +27,10 @@ export const accountsRegisterHandler = async (
   }
 };
 export const accountsMeHandler = (req: Request, res: Response) => {
-  res.status(httpStatus.OK).json("me");
+  //@ts-ignore
+  const user = { ...(req.user as User) };
+  const { createdAt, email, id, updatedAt, username, verified } = user;
+  res.status(httpStatus.OK).json({ username, id, updatedAt, createdAt, email });
 };
 export const accountsDeleteHandler = (req: Request, res: Response) => {
   res.status(httpStatus.OK).json("delete");

@@ -16,24 +16,25 @@ export const generateAuthTokens = (user_id: string) => {
 export const validateAccessToken = (token: string) => {
   if (!token) return null;
   try {
-    const decoded = jwt.verify(token, env.getAccessSecret());
+    const decoded = jwt.verify(
+      token,
+      env.getAccessSecret()
+    ) as tokenPayloadType;
     return decoded;
   } catch {
     return null;
   }
 };
-export const validateRefreshToken = (
-  token: string
-): refreshTokenDataType | null => {
+export const validateRefreshToken = (token: string) => {
   if (!token) return null;
   try {
     const decoded = jwt.verify(
       token,
       env.getRefreshTokenSecret()
-    ) as refreshTokenDataType;
+    ) as tokenPayloadType;
     return decoded;
   } catch (err) {
     return null;
   }
 };
-type refreshTokenDataType = JwtPayload & { user_id: string };
+type tokenPayloadType = JwtPayload & { user_id: string };

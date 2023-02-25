@@ -64,7 +64,8 @@ export const refreshTokenHandler = async (
     //generated new access/refresh tokens by using the decoded user_id
     const tokens = generateAuthTokens(decoded.user_id);
     //store the new refresh token in redis by using the user_id as a key
-    await redis_client.set(decoded.user_id, tokens.refreshToken);
+    // await redis_client.set(decoded.user_id, tokens.refreshToken);
+    redis_client.set(decoded.user_id, tokens.refreshToken);
     //set new signed cooked that contains  new a refresh token and a new access token
     setAuthCookies({
       res,
@@ -100,7 +101,8 @@ export const logoutTokenHandler = async (req: Request, res: Response) => {
     return res.status(httpStatus.BAD_REQUEST).json("invalid refresh token");
   //if the refresh token is valid
   //delete it from redis by using the user_id as a key
-  await redis_client.del(decoded.user_id);
+  // await redis_client.del(decoded.user_id);
+  redis_client.del(decoded.user_id);
   //delete the auth cookies
   res.clearCookie(REFRESH_COOKIE_NAME);
   res.clearCookie(ACCESS_COOKIE_NAME);

@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { zodValidatorMiddleware } from "../../core/middlewares/zod.middleware";
-import { loginSchema } from "../../lib/schemas/auth/login.schemas";
+import { loginSchema } from "../../libs/schemas/auth/login.schemas";
 import {
   logoutTokenHandler,
   obtainTokenHandler,

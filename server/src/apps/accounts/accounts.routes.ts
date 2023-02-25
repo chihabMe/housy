@@ -1,7 +1,7 @@
 import { Router } from "express";
 import protectedRouteMiddleware from "../../core/middlewares/protected.middleware";
 import { zodValidatorMiddleware } from "../../core/middlewares/zod.middleware";
-import { registrationSchema } from "../../lib/schemas/auth/registration.schemas";
+import { registrationSchema } from "../../libs/schemas/auth/registration.schemas";
 import {
   accountsActivateHandler,
   accountsChangeEmailHandler,
