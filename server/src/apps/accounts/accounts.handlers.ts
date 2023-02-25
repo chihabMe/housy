@@ -9,7 +9,10 @@ import {
   registrationSchema,
 } from "../../libs/schemas/accounts";
 import bcrypt from "bcrypt";
+import crypt from "crypto";
 import { sendAccountActivationEmail, sendMail } from "../../libs/email";
+import { TOKEN_EXPIRES_TIME } from "../../core/constants";
+import env from "../../core/env";
 export const accountsRegisterHandler = async (
   req: Request<{}, {}, TypeOf<typeof registrationSchema>>,
   res: Response,
@@ -28,10 +31,25 @@ export const accountsRegisterHandler = async (
         password: hasher(password),
       },
     });
+    const token = await prisma.token.create({
+      data: {
+        userId: user.id,
+        expiresAt: new Date(TOKEN_EXPIRES_TIME),
+        token: crypt.randomBytes(16).toString("hex"),
+      },
+    });
     //send confirmation email to the user email
+    const confirmRoute = `${env.isProduction() ? "https" : "http"}://${
+      req.headers.host
+    }/api/v1/accounts/activate/${token.token}`;
+    const html = `
+    <a href=${confirmRoute}>
+    ${confirmRoute}
+    </a>
+    `;
     sendAccountActivationEmail({
       subject: "account activation email",
-      text: "please confirm your email",
+      html,
       to: email,
     });
     //return success status and the user data
@@ -52,7 +70,12 @@ export const accountsMeHandler = (req: Request, res: Response) => {
 export const accountsDeleteHandler = (req: Request, res: Response) => {
   res.status(httpStatus.OK).json("delete");
 };
-export const accountsActivateHandler = (req: Request, res: Response) => {
+export const accountsActivateHandler = (
+  req: Request<{ token: string }>,
+  res: Response
+) => {
+  const token = req.params.token;
+  console.log(token);
   res.status(httpStatus.OK).json("activation");
 };
 

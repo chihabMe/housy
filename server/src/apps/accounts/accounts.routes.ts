@@ -27,7 +27,7 @@ accountsRouter.get("/restore/password", accountsRestorePasswordHandler);
 //
 accountsRouter.get("/delete", protectedRouteMiddleware, accountsDeleteHandler);
 accountsRouter.get(
-  "/activate",
+  "/activate/:token",
   protectedRouteMiddleware,
   accountsActivateHandler
 );
