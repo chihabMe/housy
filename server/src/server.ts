@@ -13,11 +13,15 @@ const server = async () => {
   registerMiddlewares(app);
   registerApps(app);
   registerErrorsMiddlewares(app);
-
-  redis_client_connect();
-  app.listen(env.PORT, () => {
-    console.log(`running the server on port ${env.PORT}`);
-  });
+  try {
+    await redis_client_connect();
+    app.listen(env.PORT, () => {
+      console.log(`running the server on port ${env.PORT}`);
+    });
+  } catch (err) {
+    console.log(err);
+    process.exit();
+  }
 };
 
 const registerApps = (app: Express) => {
