@@ -20,6 +20,7 @@ const protectedRouteMiddleware = async (
         id: decoded.user_id,
       },
     });
+    if (!user) return res.sendStatus(httpStatus.UNAUTHORIZED);
     //@ts-ignore
     req.user = user;
   } catch (err) {

@@ -13,6 +13,7 @@ import {
   accountsMeHandler,
   accountsRegisterHandler,
   accountsRestorePasswordHandler,
+  generateAccountActivationEmailHandler,
 } from "./accounts.handlers";
 
 export const accountsRouter = Router();
@@ -22,14 +23,15 @@ accountsRouter.post(
   accountsRegisterHandler
 );
 accountsRouter.get("/me", protectedRouteMiddleware, accountsMeHandler);
-accountsRouter.get("/restore/password", accountsRestorePasswordHandler);
+accountsRouter.post("/restore/password", accountsRestorePasswordHandler);
 
 //
-accountsRouter.get("/delete", protectedRouteMiddleware, accountsDeleteHandler);
-accountsRouter.get(
-  "/activate/:token",
+accountsRouter.post("/delete", protectedRouteMiddleware, accountsDeleteHandler);
+accountsRouter.post("/activate/:token", accountsActivateHandler);
+accountsRouter.post(
+  "/generate-token/",
   protectedRouteMiddleware,
-  accountsActivateHandler
+  generateAccountActivationEmailHandler
 );
 accountsRouter.get(
   "/change/email",

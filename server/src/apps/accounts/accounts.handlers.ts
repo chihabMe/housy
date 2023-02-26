@@ -19,7 +19,10 @@ import {
   generateActivationTokenAndStoreItInRedis,
   generateActivationURI,
 } from "./accounts.services";
-import { prefixActivationToken } from "../../libs/helpers/activation";
+import {
+  generateCanRequestAnotherTokenRedisKey,
+  prefixActivationToken,
+} from "../../libs/helpers/activation";
 export const accountsRegisterHandler = async (
   req: Request<{}, {}, TypeOf<typeof registrationSchema>>,
   res: Response,
@@ -49,6 +52,7 @@ export const accountsRegisterHandler = async (
       req,
       token: activationToken,
     });
+    console.log(activationURI);
     //send the token as a  confirmation email to the user
     sendAccountActivationEmail({
       subject: "account activation email",
@@ -178,3 +182,55 @@ export const accountsRestorePasswordHandler = (req: Request, res: Response) => {
 //     next(err);
 //   }
 // };
+
+export const generateAccountActivationEmailHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    //@ts-ignore
+    const user = req.user as User;
+    if (user.verified)
+      return res
+        .status(httpStatus.BAD_REQUEST)
+        .json(
+          "you are already verified you can't ask for a verification email"
+        );
+    const canGenerateAnotherToken = await redis_client.get(
+      generateCanRequestAnotherTokenRedisKey(user.id)
+    );
+    //if the used asked for a token before
+    //canGen... value wil be 1
+    //i will return 400 error
+    console.log("generate token", canGenerateAnotherToken);
+    if (canGenerateAnotherToken == "1")
+      return res
+        .status(httpStatus.BAD_REQUEST)
+        .json(
+          "you can't generate another token please try that again after 5 mins"
+        );
+    //generate a token for the  user to activate his email
+    //and store it in redis
+    const activationToken = await generateActivationTokenAndStoreItInRedis({
+      userId: user.id,
+    });
+    //generate an activation uri that contains the generated token
+    // http(s)://..../activate/{token}
+    const activationURI = generateActivationURI({
+      req,
+      token: activationToken,
+    });
+    console.log(activationURI);
+    //send the token as a  confirmation email to the user
+    sendAccountActivationEmail({
+      subject: "account activation email",
+      html: generateActivationEmail({ activationURI }),
+      to: user.email,
+    });
+
+    res.status(httpStatus.OK).json("please check your email");
+  } catch (err) {
+    next(err);
+  }
+};
