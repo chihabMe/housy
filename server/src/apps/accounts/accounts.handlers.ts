@@ -14,6 +14,12 @@ import { sendAccountActivationEmail, sendMail } from "../../libs/email";
 import { TOKEN_EXPIRES_TIME } from "../../core/constants";
 import env from "../../core/env";
 import redis_client from "../../core/redis_clinet";
+import {
+  generateActivationEmail,
+  generateActivationTokenAndStoreItInRedis,
+  generateActivationURI,
+} from "./accounts.services";
+import { prefixActivationToken } from "../../libs/helpers/activation";
 export const accountsRegisterHandler = async (
   req: Request<{}, {}, TypeOf<typeof registrationSchema>>,
   res: Response,
@@ -32,32 +38,21 @@ export const accountsRegisterHandler = async (
         password: hasher(password),
       },
     });
-    //create a random token and store it in the database
-
-    // const token = await prisma.token.create({
-    //   data: {
-    //     userId: user.id,
-    //     expiresAt: Date.now() + TOKEN_EXPIRES_TIME,
-    //     token: crypt.randomBytes(16).toString("hex"),
-    //   },
-    // });
-    const activationToken = crypt.randomBytes(16).toString("hex");
-    await redis_client.set(`activation-${activationToken}`, user.id, {
-      EX: TOKEN_EXPIRES_TIME,
+    //generate a token for the  user to activate his email
+    //and store it in redis
+    const activationToken = await generateActivationTokenAndStoreItInRedis({
+      userId: user.id,
     });
-    //send confirmation email to the user email
-    const confirmRoute = `${env.isProduction() ? "https" : "http"}://${
-      req.headers.host
-    }/api/v1/accounts/activate/${activationToken}`;
-    const html = `
-    <a href=${confirmRoute}>
-    ${confirmRoute}
-    </a>
-    `;
-    console.log(confirmRoute);
+    //generate an activation uri that contains the generated token
+    // http(s)://..../activate/{token}
+    const activationURI = generateActivationURI({
+      req,
+      token: activationToken,
+    });
+    //send the token as a  confirmation email to the user
     sendAccountActivationEmail({
       subject: "account activation email",
-      html,
+      html: generateActivationEmail({ activationURI }),
       to: email,
     });
     //return success status and the user data
@@ -78,6 +73,69 @@ export const accountsMeHandler = (req: Request, res: Response) => {
 export const accountsDeleteHandler = (req: Request, res: Response) => {
   res.status(httpStatus.OK).json("delete");
 };
+export const accountsActivateHandler = async (
+  req: Request<{ token: string }>,
+  res: Response,
+  next: NextFunction
+) => {
+  //get the activation token from the params
+  const activationToken = req.params.token;
+  //if the activationToken is null return 400 error with message
+  if (!activationToken)
+    return res.status(httpStatus.BAD_REQUEST).json("invalid token");
+  //get the userId from redis by
+  //using the activationToken prefixed by activation-token-
+  //as a value to the userId
+  const userId = await redis_client.get(prefixActivationToken(activationToken));
+  //if userId is null return 400 error with message
+  if (!userId) return res.status(httpStatus.BAD_REQUEST).json("invalid token");
+  //update the user to be active and verified
+  await prisma.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      active: true,
+      verified: true,
+    },
+  });
+  //delete the activationToken from redis
+  await redis_client.del(prefixActivationToken(activationToken));
+  //return success response
+  return res.status(httpStatus.OK).json("activated");
+};
+
+export const accountsUpdateProfileHandler = (req: Request, res: Response) => {
+  res.status(httpStatus.OK).json("update profile");
+};
+
+export const accountsChangePassword = async (
+  req: Request<{}, {}, TypeOf<typeof passwordChangeSchema>>,
+  res: Response
+) => {
+  const body = req.body;
+  //@ts-ignore
+  const user = req.user as User;
+  if (!bcrypt.compareSync(body.oldPassword, user.password))
+    return res.status(httpStatus.BAD_REQUEST).json("invalid user password");
+  const password = hasher(body.newPassword);
+  await prisma.user.update({
+    where: {
+      id: user.id,
+    },
+    data: {
+      password,
+    },
+  });
+  res.status(httpStatus.OK).json("your password has been changed");
+};
+export const accountsChangeEmailHandler = (req: Request, res: Response) => {
+  res.status(httpStatus.OK).json("change email");
+};
+export const accountsRestorePasswordHandler = (req: Request, res: Response) => {
+  res.status(httpStatus.OK).json("restore password");
+};
+
 // export const accountsActivateHandler = async (
 //   req: Request<{ token: string }>,
 //   res: Response,
@@ -120,58 +178,3 @@ export const accountsDeleteHandler = (req: Request, res: Response) => {
 //     next(err);
 //   }
 // };
-
-export const accountsActivateHandler = async (
-  req: Request<{ token: string }>,
-  res: Response,
-  next: NextFunction
-) => {
-  const activationToken = req.params.token;
-  if (!activationToken)
-    return res.status(httpStatus.BAD_REQUEST).json("invalid token");
-  const userId = await redis_client.get(`activation-${activationToken}`);
-  console.log(userId);
-  if (!userId) return res.status(httpStatus.BAD_REQUEST).json("invalid token");
-  await prisma.user.update({
-    where: {
-      id: userId,
-    },
-    data: {
-      active: true,
-      verified: true,
-    },
-  });
-  await redis_client.del(`activation-${activationToken}`);
-  return res.status(httpStatus.OK).json("activated");
-};
-
-export const accountsUpdateProfileHandler = (req: Request, res: Response) => {
-  res.status(httpStatus.OK).json("update profile");
-};
-
-export const accountsChangePassword = async (
-  req: Request<{}, {}, TypeOf<typeof passwordChangeSchema>>,
-  res: Response
-) => {
-  const body = req.body;
-  //@ts-ignore
-  const user = req.user as User;
-  if (!bcrypt.compareSync(body.oldPassword, user.password))
-    return res.status(httpStatus.BAD_REQUEST).json("invalid user password");
-  const password = hasher(body.newPassword);
-  await prisma.user.update({
-    where: {
-      id: user.id,
-    },
-    data: {
-      password,
-    },
-  });
-  res.status(httpStatus.OK).json("your password has been changed");
-};
-export const accountsChangeEmailHandler = (req: Request, res: Response) => {
-  res.status(httpStatus.OK).json("change email");
-};
-export const accountsRestorePasswordHandler = (req: Request, res: Response) => {
-  res.status(httpStatus.OK).json("restore password");
-};
