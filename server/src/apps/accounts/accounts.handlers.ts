@@ -8,11 +8,7 @@ import {
   passwordChangeSchema,
   registrationSchema,
 } from "../../libs/schemas/accounts";
-import bcrypt from "bcrypt";
-import crypt from "crypto";
 import { sendAccountActivationEmail, sendMail } from "../../libs/email";
-import { TOKEN_EXPIRES_TIME } from "../../core/constants";
-import env from "../../core/env";
 import redis_client from "../../core/redis_clinet";
 import {
   compareUserPassword,
