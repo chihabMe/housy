@@ -7,8 +7,16 @@ import _500 from "./core/middlewares/500.middleware";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import { redis_client_connect } from "./core/redis_clinet";
+import { readFile } from "fs";
+// import { promisify } from "util";
+import fs from "fs";
+import https from "https";
+// const readFilesAsync = promisify(readFile);
 
 const server = async () => {
+  // const key = fs.readFileSync(__dirname + "/ssl/housy.pem");
+  // const cert = fs.readFileSync(__dirname + "/ssl/housy.crt");
+
   const app = express();
   registerMiddlewares(app);
   registerApps(app);
@@ -18,6 +26,10 @@ const server = async () => {
     app.listen(env.PORT, () => {
       console.log(`running the server on port ${env.PORT}`);
     });
+    // const opts = { key: key.toString(), cert: cert.toString() };
+    // https.createServer(opts, app).listen(env.PORT, () => {
+    //   console.log("the server is running on port ", env.PORT);
+    // });
   } catch (err) {
     console.log(err);
     process.exit();

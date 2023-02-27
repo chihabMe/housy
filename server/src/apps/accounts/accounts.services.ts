@@ -1,6 +1,5 @@
 import crypto from "crypto";
-import { Request } from "express";
-import httpStatus from "http-status";
+import bcrypt from "bcrypt";
 import {
   REQUEST_ANOTHER_ACTIVATION_TOKEN_TIME,
   TOKEN_EXPIRES_TIME,
@@ -31,14 +30,14 @@ export const generateActivationTokenAndStoreItInRedis = async ({
 };
 export const generateActivationURI = ({
   token,
-  req,
+  host,
 }: {
-  req: Request;
+  host: string;
   token: string;
 }) => {
-  return `${env.isProduction() ? "https" : "http"}://${
-    req.headers.host
-  }/api/v1/accounts/activate/${token}`;
+  return `${
+    env.isProduction() ? "https" : "http"
+  }://${host}/api/v1/accounts/activate/${token}`;
 };
 export const generateActivationEmail = ({
   activationURI,
@@ -50,4 +49,25 @@ export const generateActivationEmail = ({
     ${activationURI}
     </a>
     `;
+};
+
+export const compareUserPassword = ({
+  password,
+  hash,
+}: {
+  password: string;
+  hash: string;
+}) => {
+  return bcrypt.compareSync(password, hash);
+};
+
+//this function will
+//get the userId from redis by using the activation as key
+export const getUserIdFromRedisUsingTheActionToken = async (token: string) => {
+  return await redis_client.get(prefixActivationToken(token));
+};
+//this function will
+//delete the activationToken from redis
+export const invalidateTheActivationToken = async (token: string) => {
+  return redis_client.del(prefixActivationToken(token));
 };

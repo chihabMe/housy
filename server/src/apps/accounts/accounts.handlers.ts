@@ -15,9 +15,12 @@ import { TOKEN_EXPIRES_TIME } from "../../core/constants";
 import env from "../../core/env";
 import redis_client from "../../core/redis_clinet";
 import {
+  compareUserPassword,
   generateActivationEmail,
   generateActivationTokenAndStoreItInRedis,
   generateActivationURI,
+  getUserIdFromRedisUsingTheActionToken,
+  invalidateTheActivationToken,
 } from "./accounts.services";
 import {
   generateCanRequestAnotherTokenRedisKey,
@@ -33,7 +36,7 @@ export const accountsRegisterHandler = async (
   //extracting the registration fields
   const { email, password, username } = req.body;
   try {
-    //save the user in the database
+    //create a user and store it in the database
     const user = await prisma.user.create({
       data: {
         email,
@@ -41,15 +44,14 @@ export const accountsRegisterHandler = async (
         password: hasher(password),
       },
     });
-    //generate a token for the  user to activate his email
-    //and store it in redis
+    //generate activation token
     const activationToken = await generateActivationTokenAndStoreItInRedis({
       userId: user.id,
     });
     //generate an activation uri that contains the generated token
     // http(s)://..../activate/{token}
     const activationURI = generateActivationURI({
-      req,
+      host: req.headers.host ?? "",
       token: activationToken,
     });
     console.log(activationURI);
@@ -71,7 +73,7 @@ export const accountsRegisterHandler = async (
 export const accountsMeHandler = (req: Request, res: Response) => {
   //@ts-ignore
   const user = { ...(req.user as User) };
-  const { createdAt, email, id, updatedAt, username, verified } = user;
+  const { createdAt, email, id, updatedAt, username } = user;
   res.status(httpStatus.OK).json({ username, id, updatedAt, createdAt, email });
 };
 export const accountsDeleteHandler = (req: Request, res: Response) => {
@@ -90,7 +92,7 @@ export const accountsActivateHandler = async (
   //get the userId from redis by
   //using the activationToken prefixed by activation-token-
   //as a value to the userId
-  const userId = await redis_client.get(prefixActivationToken(activationToken));
+  const userId = await getUserIdFromRedisUsingTheActionToken(activationToken);
   //if userId is null return 400 error with message
   if (!userId) return res.status(httpStatus.BAD_REQUEST).json("invalid token");
   //update the user to be active and verified
@@ -104,7 +106,7 @@ export const accountsActivateHandler = async (
     },
   });
   //delete the activationToken from redis
-  await redis_client.del(prefixActivationToken(activationToken));
+  await invalidateTheActivationToken(activationToken);
   //return success response
   return res.status(httpStatus.OK).json("activated");
 };
@@ -117,20 +119,22 @@ export const accountsChangePassword = async (
   req: Request<{}, {}, TypeOf<typeof passwordChangeSchema>>,
   res: Response
 ) => {
-  const body = req.body;
+  const { oldPassword, newPassword } = req.body;
   //@ts-ignore
   const user = req.user as User;
-  if (!bcrypt.compareSync(body.oldPassword, user.password))
+  //validate the entered password and the user password
+  if (!compareUserPassword({ password: oldPassword, hash: user.password }))
     return res.status(httpStatus.BAD_REQUEST).json("invalid user password");
-  const password = hasher(body.newPassword);
+  //update the user with the hash of the new password
   await prisma.user.update({
     where: {
       id: user.id,
     },
     data: {
-      password,
+      password: hasher(newPassword),
     },
   });
+  //return success response
   res.status(httpStatus.OK).json("your password has been changed");
 };
 export const accountsChangeEmailHandler = (req: Request, res: Response) => {
@@ -218,7 +222,7 @@ export const generateAccountActivationEmailHandler = async (
     //generate an activation uri that contains the generated token
     // http(s)://..../activate/{token}
     const activationURI = generateActivationURI({
-      req,
+      host: req.headers.host ?? "",
       token: activationToken,
     });
     console.log(activationURI);
