@@ -34,14 +34,13 @@ model Profile {
 
 model Property {
   id             String  @id @default(uuid())
-  title          String
-  description    String
+  title          String  @db.VarChar(300)
+  description    String  @db.VarChar(1000)
   price          Int
   beds           Int     @default(1)
   baths          Int     @default(1)
   garages        Int     @default(1)
   sqft           Int
-  location       String
   street         String
   city           String
   builtYear      Int
@@ -59,6 +58,10 @@ model Property {
   updatedAt    DateTime         @default(now()) @updatedAt
   properity    PropertyCategory @relation(fields: [propertyId], references: [id])
   propertyId   String
+
+  @@index([street])
+  @@index([city])
+  @@index([builtYear])
 }
 
 model PropertyImage {
