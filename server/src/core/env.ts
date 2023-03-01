@@ -1,6 +1,6 @@
 import { config } from "dotenv";
 config();
-const PORT = process.env.PORT ?? 3001;
+const PORT = process.env.PORT ?? 3000;
 export const getCookieSecretKey = () => {
   const secret = process.env.COOKIE_SECRET;
   if (!secret)

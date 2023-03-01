@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import httpStatus from "http-status";
+import httpStatus, { BAD_REQUEST } from "http-status";
 import { ACCESS_COOKIE_NAME, REFRESH_COOKIE_NAME } from "../../core/constants";
 import prisma from "../../core/prisma";
 import redis_client from "../../core/redis_clinet";
@@ -10,34 +10,66 @@ import {
   validateRefreshToken,
 } from "./auth.services";
 import bcrypt from "bcrypt";
-import { sendMail } from "../../libs/email";
-import env from "../../core/env";
 
 export const obtainTokenHandler = async (
   req: Request<{}, {}, { email: string; password: string }>,
   res: Response,
   next: NextFunction
 ) => {
+  //extracts the email and the password from the body
   const { email, password } = req.body;
-  const user = await prisma.user.findFirst({
-    where: {
-      email,
-    },
-  });
-  if (!user || !bcrypt.compareSync(password, user.password))
-    return res
-      .status(httpStatus.BAD_REQUEST)
-      .json({ message: "invalid user credentials" });
+  try {
+    //try to find a use with this email
+    const user = await prisma.user.findFirst({
+      where: {
+        email,
+      },
+    });
+    //if there is no use with this email
+    // or
+    // the entered password is not he same as that user password
+    // return an 400 error with invalid credentials
+    if (!user || !bcrypt.compareSync(password, user.password))
+      return res.status(httpStatus.BAD_REQUEST).json({
+        success: false,
+        type: "invalidCredentials",
+        error: "please check your email and password and try again",
+      });
 
-  const tokens = generateAuthTokens(user.id);
-  redis_client.set(user.id, tokens.refreshToken);
-  setAuthCookies({
-    res,
-    access: tokens.accessToken,
-    refresh: tokens.refreshToken,
-  });
-  return res.status(httpStatus.OK).json({ status: "success" });
+    if (!user.verified || !user.active)
+      return res.status(BAD_REQUEST).json({
+        success: false,
+        type: "unverifiedEmail",
+        error:
+          "you need to verify your email to activate your account please check your email box for the activation email if you didn't receive any emails you can request a new activation email ",
+      });
+    // if the user credentials are valid
+    // generate an access and refresh token
+    const tokens = generateAuthTokens(user.id);
+    //store the refreh token in redis by using the user id as a key
+    redis_client.set(user.id, tokens.refreshToken);
+    //set the authentication headers for the response
+    setAuthCookies({
+      res,
+      access: tokens.accessToken,
+      refresh: tokens.refreshToken,
+    });
+    //return success response
+    return res.status(httpStatus.OK).json({
+      success: true,
+    });
+  } catch (err) {
+    //pass the error to the errors handler middleware
+    next(err);
+  }
 };
+
+//this  handler fucn is responsble for refreshing the user access token and rotating the refresh token
+//this handler func extracts  the refresh token from  the refresh header or the refresh cookie
+// it will compare the revcieved refresh token with the one stored in redis
+// it  will generate a new access token and a new refresh token if they are the same
+// it will store the refresh token in redis by using the user id as a key
+// it will set new refresh/access cookies
 export const refreshTokenHandler = async (
   req: Request<{}, {}, { refresh: string }>,
   res: Response,

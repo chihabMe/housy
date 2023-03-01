@@ -25,8 +25,11 @@ accountsRouter.post(
 accountsRouter.get("/me", protectedRouteMiddleware, accountsMeHandler);
 accountsRouter.post("/restore/password", accountsRestorePasswordHandler);
 
-//
-accountsRouter.post("/delete", protectedRouteMiddleware, accountsDeleteHandler);
+accountsRouter.delete(
+  "/me/delete",
+  protectedRouteMiddleware,
+  accountsDeleteHandler
+);
 accountsRouter.post("/activate/:token", accountsActivateHandler);
 accountsRouter.post(
   "/generate-token/",

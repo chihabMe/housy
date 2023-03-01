@@ -22,6 +22,7 @@ import {
   generateCanRequestAnotherTokenRedisKey,
   prefixActivationToken,
 } from "../../libs/helpers/activation";
+import { ACCESS_COOKIE_NAME, REFRESH_COOKIE_NAME } from "../../core/constants";
 export const accountsRegisterHandler = async (
   req: Request<{}, {}, TypeOf<typeof registrationSchema>>,
   res: Response,
@@ -72,8 +73,32 @@ export const accountsMeHandler = (req: Request, res: Response) => {
   const { createdAt, email, id, updatedAt, username } = user;
   res.status(httpStatus.OK).json({ username, id, updatedAt, createdAt, email });
 };
-export const accountsDeleteHandler = (req: Request, res: Response) => {
-  res.status(httpStatus.OK).json("delete");
+export const accountsDeleteHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    //@ts-ignore
+    const user = req.user as User;
+    await prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        active: false,
+      },
+    });
+    //delete the stored refresh token from redis
+    await redis_client.del(user.id);
+    //delete the  authentication cookies
+    res.clearCookie(REFRESH_COOKIE_NAME);
+    res.clearCookie(ACCESS_COOKIE_NAME);
+
+    res.status(httpStatus.OK).json({ success: true, message: "deleted" });
+  } catch (err) {
+    next(err);
+  }
 };
 export const accountsActivateHandler = async (
   req: Request<{ token: string }>,
@@ -85,26 +110,31 @@ export const accountsActivateHandler = async (
   //if the activationToken is null return 400 error with message
   if (!activationToken)
     return res.status(httpStatus.BAD_REQUEST).json("invalid token");
-  //get the userId from redis by
-  //using the activationToken prefixed by activation-token-
-  //as a value to the userId
-  const userId = await getUserIdFromRedisUsingTheActionToken(activationToken);
-  //if userId is null return 400 error with message
-  if (!userId) return res.status(httpStatus.BAD_REQUEST).json("invalid token");
-  //update the user to be active and verified
-  await prisma.user.update({
-    where: {
-      id: userId,
-    },
-    data: {
-      active: true,
-      verified: true,
-    },
-  });
-  //delete the activationToken from redis
-  await invalidateTheActivationToken(activationToken);
-  //return success response
-  return res.status(httpStatus.OK).json("activated");
+  try {
+    //get the userId from redis by
+    //using the activationToken prefixed by activation-token-
+    //as a value to the userId
+    const userId = await getUserIdFromRedisUsingTheActionToken(activationToken);
+    //if userId is null return 400 error with message
+    if (!userId)
+      return res.status(httpStatus.BAD_REQUEST).json("invalid token");
+    //update the user to be active and verified
+    await prisma.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        active: true,
+        verified: true,
+      },
+    });
+    //delete the activationToken from redis
+    await invalidateTheActivationToken(activationToken);
+    //return success response
+    return res.status(httpStatus.OK).json("activated");
+  } catch (err) {
+    next(err);
+  }
 };
 
 export const accountsUpdateProfileHandler = (req: Request, res: Response) => {
