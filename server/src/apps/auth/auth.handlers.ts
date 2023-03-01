@@ -46,7 +46,7 @@ export const obtainTokenHandler = async (
     // if the user credentials are valid
     // generate an access and refresh token
     const tokens = generateAuthTokens(user.id);
-    //store the refreh token in redis by using the user id as a key
+    //store the refresh token in redis by using the user id as a key
     redis_client.set(user.id, tokens.refreshToken);
     //set the authentication headers for the response
     setAuthCookies({
@@ -64,9 +64,9 @@ export const obtainTokenHandler = async (
   }
 };
 
-//this  handler fucn is responsble for refreshing the user access token and rotating the refresh token
+//this  handler fun is responsible for refreshing the user access token and rotating the refresh token
 //this handler func extracts  the refresh token from  the refresh header or the refresh cookie
-// it will compare the revcieved refresh token with the one stored in redis
+// it will compare the received refresh token with the one stored in redis
 // it  will generate a new access token and a new refresh token if they are the same
 // it will store the refresh token in redis by using the user id as a key
 // it will set new refresh/access cookies
