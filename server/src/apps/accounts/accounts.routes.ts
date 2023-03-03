@@ -15,6 +15,7 @@ import {
   accountsRestorePasswordHandler,
   generateAccountActivationEmailHandler,
 } from "./accounts.handlers";
+import { accountActivationSchema } from "./accounts.schemas";
 
 export const accountsRouter = Router();
 accountsRouter.post(
@@ -29,7 +30,7 @@ accountsRouter.delete("/", protectedRouteMiddleware, accountsDeleteHandler);
 accountsRouter.post("/activate/:token", accountsActivateHandler);
 accountsRouter.post(
   "/generate-token/",
-  protectedRouteMiddleware,
+  zodValidatorMiddleware(accountActivationSchema),
   generateAccountActivationEmailHandler
 );
 accountsRouter.get(

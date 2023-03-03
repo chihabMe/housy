@@ -30,6 +30,8 @@ import {
   createUserInteractor,
   deleteTokenById,
   findTokenByToken,
+  findUserByEmail,
+  getLastGeneratedTokenFromAUser,
   updateUserInteractor,
 } from "./accounts.interactors";
 export const accountsRegisterHandler = async (
@@ -174,29 +176,24 @@ export const generateAccountActivationEmailHandler = async (
   next: NextFunction
 ) => {
   try {
-    //@ts-ignore
-    const user = req.user as User;
-    if (user.active)
-      return res
-        .status(httpStatus.BAD_REQUEST)
-        .json(
-          "you are already verified you can't ask for a verification email"
-        );
+    const email = req.body.email;
+    const user = await findUserByEmail(email);
+    let successResponse = "please check your email fo the activation email";
+    //to protect the api from exposing the registered users
+    //i will alway return a success response
+    if (!user || user.active) return res.status(200).json(successResponse);
     const canGenerateAnotherToken = await redis_client.get(
       generateCanRequestAnotherTokenRedisKey(user.id)
     );
-    //if the used asked for a token before
-    //canGen... value wil be 1
-    //i will return 400 error
-    console.log("generate token", canGenerateAnotherToken);
-    if (canGenerateAnotherToken == "1")
+    const lastGeneratedToken = await getLastGeneratedTokenFromAUser(user.id);
+    let now = new Date().getTime();
+    if (now - lastGeneratedToken.createdAt.getTime() < TOKEN_EXPIRES_TIME)
       return res
         .status(httpStatus.BAD_REQUEST)
         .json(
-          "you can't generate another token please try that again after 5 mins"
+          "you asked for an email before please wait 15 mins and try that again"
         );
     //generate a token for the  user to activate his email
-    //and store it in redis
     const activationToken = await createTokenInteractor({
       expiresAt: Date.now() + TOKEN_EXPIRES_TIME,
       token: crypto.randomBytes(16).toString("hex"),
@@ -210,7 +207,7 @@ export const generateAccountActivationEmailHandler = async (
     });
     console.log(activationURI);
     //send the token as a  confirmation email to the user
-    sendAccountActivationEmail({
+    await sendAccountActivationEmail({
       subject: "account activation email",
       html: generateActivationEmail({ activationURI }),
       to: user.email,

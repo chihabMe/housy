@@ -79,3 +79,16 @@ export const deleteTokenById = async (tokenId: string) => {
     },
   });
 };
+
+export const getLastGeneratedTokenFromAUser = async (userId: string) => {
+  const [token] = await prisma.token.findMany({
+    where: {
+      userId,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    take: 5,
+  });
+  return token;
+};
