@@ -10,7 +10,7 @@ import { redis_client_connect } from "./core/redis_clinet";
 // import { promisify } from "util";
 // const readFilesAsync = promisify(readFile);
 
-const server = async () => {
+export const createServer = () => {
   // const key = fs.readFileSync(__dirname + "/ssl/housy.pem");
   // const cert = fs.readFileSync(__dirname + "/ssl/housy.crt");
 
@@ -18,19 +18,7 @@ const server = async () => {
   registerMiddlewares(app);
   registerApps(app);
   registerErrorsMiddlewares(app);
-  try {
-    await redis_client_connect();
-    app.listen(env.PORT, () => {
-      console.log(`running the server on port ${env.PORT}`);
-    });
-    // const opts = { key: key.toString(), cert: cert.toString() };
-    // https.createServer(opts, app).listen(env.PORT, () => {
-    //   console.log("the server is running on port ", env.PORT);
-    // });
-  } catch (err) {
-    console.log(err);
-    process.exit();
-  }
+  return app;
 };
 
 const registerApps = (app: Express) => {
@@ -47,5 +35,3 @@ const registerErrorsMiddlewares = (app: Express) => {
   app.use(_404);
   app.use(_500);
 };
-
-if (require.main == module) server();

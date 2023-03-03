@@ -12,7 +12,7 @@ export const registrationSchema = z
       ),
     rePassword: z.string(),
   })
-  .refine((data) => data.password != data.rePassword, {
+  .refine((data) => data.password == data.rePassword, {
     message: "Passwords don't match",
     path: ["rePassword"],
   });

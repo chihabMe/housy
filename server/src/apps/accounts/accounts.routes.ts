@@ -18,18 +18,14 @@ import {
 
 export const accountsRouter = Router();
 accountsRouter.post(
-  "/register",
+  "/",
   zodValidatorMiddleware(registrationSchema),
   accountsRegisterHandler
 );
 accountsRouter.get("/me", protectedRouteMiddleware, accountsMeHandler);
 accountsRouter.post("/restore/password", accountsRestorePasswordHandler);
 
-accountsRouter.delete(
-  "/me/delete",
-  protectedRouteMiddleware,
-  accountsDeleteHandler
-);
+accountsRouter.delete("/", protectedRouteMiddleware, accountsDeleteHandler);
 accountsRouter.post("/activate/:token", accountsActivateHandler);
 accountsRouter.post(
   "/generate-token/",

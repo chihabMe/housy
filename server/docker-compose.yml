@@ -1,0 +1,15 @@
+# Set the version of docker compose to use
+version: "3.9"
+
+# The containers that compose the project
+services:
+  db:
+    image: postgres:13
+    restart: always
+    container_name: housy-backend
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_USER: housyUser
+      POSTGRES_PASSWORD: housyPass
+      POSTGRES_DB: housyDb
