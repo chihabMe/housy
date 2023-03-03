@@ -10,23 +10,11 @@ import {
   generateCanRequestAnotherTokenRedisKey,
   prefixActivationToken,
 } from "../../libs/helpers/activation";
-export const generateActivationTokenAndStoreItInRedis = async ({
-  userId,
-}: {
-  userId: string;
-}) => {
-  //generate 16 random  characters (token)
-  const activationToken = crypto.randomBytes(16).toString("hex");
-  //2 store the userId as value in redis with the token as key
-  await redis_client.set(prefixActivationToken(activationToken), userId, {
-    EX: TOKEN_EXPIRES_TIME,
-  });
-  //
+
+export const storeThatThisUserAskedForAToken = async (userId: string) => {
   await redis_client.set(generateCanRequestAnotherTokenRedisKey(userId), 1, {
     EX: REQUEST_ANOTHER_ACTIVATION_TOKEN_TIME,
   });
-  //3 return the generated token
-  return activationToken;
 };
 export const generateActivationURI = ({
   token,

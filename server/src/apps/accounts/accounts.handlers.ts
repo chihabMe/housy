@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { TypeOf } from "zod";
 import httpStatus from "http-status";
 import { hasher } from "../../libs/hasher";
+import crypto from "crypto";
 import { User } from "@prisma/client";
 import {
   passwordChangeSchema,
@@ -12,18 +13,23 @@ import redis_client from "../../core/redis_clinet";
 import {
   compareUserPassword,
   generateActivationEmail,
-  generateActivationTokenAndStoreItInRedis,
   generateActivationURI,
-  getUserIdFromRedisUsingTheActionToken,
-  invalidateTheActivationToken,
+  storeThatThisUserAskedForAToken,
 } from "./accounts.services";
 import {
   generateCanRequestAnotherTokenRedisKey,
   prefixActivationToken,
 } from "../../libs/helpers/activation";
-import { ACCESS_COOKIE_NAME, REFRESH_COOKIE_NAME } from "../../core/constants";
 import {
+  ACCESS_COOKIE_NAME,
+  REFRESH_COOKIE_NAME,
+  TOKEN_EXPIRES_TIME,
+} from "../../core/constants";
+import {
+  createTokenInteractor,
   createUserInteractor,
+  deleteTokenById,
+  findTokenByToken,
   updateUserInteractor,
 } from "./accounts.interactors";
 export const accountsRegisterHandler = async (
@@ -43,22 +49,27 @@ export const accountsRegisterHandler = async (
       username,
     });
     //generate activation token
-    const activationToken = await generateActivationTokenAndStoreItInRedis({
+    const token = crypto.randomBytes(16).toString("hex");
+    const activationToken = await createTokenInteractor({
+      token,
       userId: user.id,
+      expiresAt: Date.now() + TOKEN_EXPIRES_TIME,
     });
-    //generate an activation uri that contains the generated token
+    //generate the activation uri
     // http(s)://..../activate/{token}
     const activationURI = generateActivationURI({
       host: req.headers.host ?? "",
-      token: activationToken,
+      token: activationToken.token,
     });
     console.log(activationURI);
     //send the token as a  confirmation email to the user
-    sendAccountActivationEmail({
+    await sendAccountActivationEmail({
       subject: "account activation email",
       html: generateActivationEmail({ activationURI }),
       to: email,
     });
+    //to store the use for asking many activation links in a short time
+    await storeThatThisUserAskedForAToken(user.id);
     //return success status and the user data
     res
       .status(httpStatus.CREATED)
@@ -108,21 +119,19 @@ export const accountsActivateHandler = async (
   if (!activationToken)
     return res.status(httpStatus.BAD_REQUEST).json("invalid token");
   try {
-    //get the userId from redis by
-    //using the activationToken prefixed by activation-token-
-    //as a value to the userId
-    const userId = await getUserIdFromRedisUsingTheActionToken(activationToken);
-    //if userId is null return 400 error with message
-    if (!userId)
-      return res.status(httpStatus.BAD_REQUEST).json("invalid token");
+    //get the user by using the activation token
+    const token = await findTokenByToken(activationToken);
+    if (!token) return res.status(httpStatus.BAD_REQUEST).json("invalid token");
+    if (Date.now() > token.expiresAt)
+      res.status(httpStatus.BAD_REQUEST).json("dead token token");
     //update the user to be active and verified
     await updateUserInteractor({
-      userId,
+      userId: token.userId,
       active: true,
       verified: true,
     });
-    //delete the activationToken from redis
-    await invalidateTheActivationToken(activationToken);
+    //delete the activationToken
+    await deleteTokenById(token.id);
     //return success response
     return res.status(httpStatus.OK).json("activated");
   } catch (err) {
@@ -159,49 +168,6 @@ export const accountsRestorePasswordHandler = (req: Request, res: Response) => {
   res.status(httpStatus.OK).json("restore password");
 };
 
-// export const accountsActivateHandler = async (
-//   req: Request<{ token: string }>,
-//   res: Response,
-//   next: NextFunction
-// ) => {
-//   const reqToken = req.params.token;
-//   console.log(reqToken);
-//   try {
-//     const time = Date.now();
-//     const token = await prisma.token.findFirst({
-//       where: {
-//         token: reqToken,
-//       },
-//     });
-//     if (!token || !token.active || Date.now() > token.expiresAt)
-//       return res.status(httpStatus.BAD_REQUEST).json("invalid token");
-//     await prisma.user.update({
-//       where: {
-//         id: token.userId,
-//       },
-//       data: {
-//         verified: true,
-//         active: true,
-//       },
-//       select: {
-//         id: true,
-//       },
-//     });
-//     await prisma.token.update({
-//       where: {
-//         id: token.id,
-//       },
-//       data: {
-//         active: false,
-//       },
-//     });
-//     console.log("it took", Date.now() - time);
-//     res.status(httpStatus.OK).json("activated");
-//   } catch (err) {
-//     next(err);
-//   }
-// };
-
 export const generateAccountActivationEmailHandler = async (
   req: Request,
   res: Response,
@@ -210,7 +176,7 @@ export const generateAccountActivationEmailHandler = async (
   try {
     //@ts-ignore
     const user = req.user as User;
-    if (user.verified)
+    if (user.active)
       return res
         .status(httpStatus.BAD_REQUEST)
         .json(
@@ -231,14 +197,16 @@ export const generateAccountActivationEmailHandler = async (
         );
     //generate a token for the  user to activate his email
     //and store it in redis
-    const activationToken = await generateActivationTokenAndStoreItInRedis({
+    const activationToken = await createTokenInteractor({
+      expiresAt: Date.now() + TOKEN_EXPIRES_TIME,
+      token: crypto.randomBytes(16).toString("hex"),
       userId: user.id,
     });
     //generate an activation uri that contains the generated token
     // http(s)://..../activate/{token}
     const activationURI = generateActivationURI({
       host: req.headers.host ?? "",
-      token: activationToken,
+      token: activationToken.token,
     });
     console.log(activationURI);
     //send the token as a  confirmation email to the user

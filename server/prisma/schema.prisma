@@ -10,6 +10,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Token {
+  id        String   @id @default(uuid())
+  token     String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  createdAt DateTime @default(now())
+  expiresAt BigInt
+
+  @@index([token])
+}
+
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
@@ -20,11 +31,12 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
   Profile   Profile?
+  Tokens    Token[]
 }
 
 model Profile {
   id         String     @id @default(uuid())
-  user       User       @relation(fields: [userId], references: [id])
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     String     @unique
   avatar     String
   properites Property[]
@@ -52,11 +64,11 @@ model Property {
 
   featuredImag String
   images       PropertyImage[]
-  publisher    Profile          @relation(fields: [publisherId], references: [id])
+  publisher    Profile          @relation(fields: [publisherId], references: [id], onDelete: Cascade)
   publisherId  String
   createdAt    DateTime         @default(now())
   updatedAt    DateTime         @default(now()) @updatedAt
-  properity    PropertyCategory @relation(fields: [propertyId], references: [id])
+  properity    PropertyCategory @relation(fields: [propertyId], references: [id], onDelete: Cascade)
   propertyId   String
 
   @@index([street])
@@ -69,7 +81,7 @@ model PropertyImage {
   image      String
   alt        String
   createdAt  DateTime @default(now())
-  property   Property @relation(fields: [propertyId], references: [id])
+  property   Property @relation(fields: [propertyId], references: [id], onDelete: Cascade)
   propertyId String
 }
 
