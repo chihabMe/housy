@@ -14,6 +14,7 @@ describe("user registration", () => {
     await prisma.profile.deleteMany();
     await prisma.property.deleteMany();
     await prisma.propertyCategory.deleteMany();
+    await prisma.$disconnect();
   });
   describe("test user registration", () => {
     it("there is not user in the database", async () => {

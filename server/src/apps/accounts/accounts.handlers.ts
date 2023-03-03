@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { TypeOf } from "zod";
 import httpStatus from "http-status";
-import prisma from "../../core/prisma";
 import { hasher } from "../../libs/hasher";
 import { User } from "@prisma/client";
 import {
@@ -23,6 +22,10 @@ import {
   prefixActivationToken,
 } from "../../libs/helpers/activation";
 import { ACCESS_COOKIE_NAME, REFRESH_COOKIE_NAME } from "../../core/constants";
+import {
+  createUserInteractor,
+  updateUserInteractor,
+} from "./accounts.interactors";
 export const accountsRegisterHandler = async (
   req: Request<{}, {}, TypeOf<typeof registrationSchema>>,
   res: Response,
@@ -34,12 +37,10 @@ export const accountsRegisterHandler = async (
   const { email, password, username } = req.body;
   try {
     //create a user and store it in the database
-    const user = await prisma.user.create({
-      data: {
-        email,
-        username,
-        password: hasher(password),
-      },
+    const user = await createUserInteractor({
+      email,
+      password: hasher(password),
+      username,
     });
     //generate activation token
     const activationToken = await generateActivationTokenAndStoreItInRedis({
@@ -81,13 +82,9 @@ export const accountsDeleteHandler = async (
   try {
     //@ts-ignore
     const user = req.user as User;
-    await prisma.user.update({
-      where: {
-        id: user.id,
-      },
-      data: {
-        active: false,
-      },
+    await updateUserInteractor({
+      userId: user.id,
+      active: false,
     });
     //delete the stored refresh token from redis
     await redis_client.del(user.id);
@@ -119,14 +116,10 @@ export const accountsActivateHandler = async (
     if (!userId)
       return res.status(httpStatus.BAD_REQUEST).json("invalid token");
     //update the user to be active and verified
-    await prisma.user.update({
-      where: {
-        id: userId,
-      },
-      data: {
-        active: true,
-        verified: true,
-      },
+    await updateUserInteractor({
+      userId,
+      active: true,
+      verified: true,
     });
     //delete the activationToken from redis
     await invalidateTheActivationToken(activationToken);
@@ -152,13 +145,9 @@ export const accountsChangePassword = async (
   if (!compareUserPassword({ password: oldPassword, hash: user.password }))
     return res.status(httpStatus.BAD_REQUEST).json("invalid user password");
   //update the user with the hash of the new password
-  await prisma.user.update({
-    where: {
-      id: user.id,
-    },
-    data: {
-      password: hasher(newPassword),
-    },
+  await updateUserInteractor({
+    userId: user.id,
+    password: hasher(newPassword),
   });
   //return success response
   res.status(httpStatus.OK).json("your password has been changed");
