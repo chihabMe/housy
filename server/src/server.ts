@@ -6,7 +6,7 @@ import _404 from "./core/middlewares/404.middleware";
 import _500 from "./core/middlewares/500.middleware";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
-import { redis_client_connect } from "./core/redis_clinet";
+import { redis_client_connect } from "./core/redis_client";
 // import { promisify } from "util";
 // const readFilesAsync = promisify(readFile);
 

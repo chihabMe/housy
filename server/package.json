@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "dotenv -e .env.test  -- jest -i",
+    "test": "dotenv -e .env.test  -- jest -i ",
     "dev": "dotenv -e .env.development   nodemon ./src/app.ts",
     "prisma": "dotenv -e .env.development -- prisma   ",
     "migrate:test": "dotenv -e .env.test -- pnpm prisma migrate deploy"

@@ -1,6 +1,6 @@
 import supertest from "supertest";
 import prisma from "../../../core/prisma";
-import { redis_client_connect } from "../../../core/redis_clinet";
+import { redis_client_connect } from "../../../core/redis_client";
 import { createServer } from "../../../server";
 import { findUserByEmail } from "../accounts.interactors";
 

@@ -4,7 +4,7 @@ import {
   REFRESH_COOKIE_NAME,
 } from "../../../core/constants";
 import prisma from "../../../core/prisma";
-import { redis_client_connect } from "../../../core/redis_clinet";
+import { redis_client_connect } from "../../../core/redis_client";
 import { hasher } from "../../../libs/hasher";
 import { createServer } from "../../../server";
 import {

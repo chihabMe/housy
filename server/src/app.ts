@@ -1,5 +1,5 @@
 import env from "./core/env";
-import { redis_client_connect } from "./core/redis_clinet";
+import { redis_client_connect } from "./core/redis_client";
 import { createServer } from "./server";
 
 const runServer = async () => {

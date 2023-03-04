@@ -29,7 +29,6 @@ export const getRedisURL = () => {
   const password = process.env.REDIS_PASSWORD;
   const username = process.env.REDIS_USERNAME;
   if (!isProduction()) return `redis://:@localhost:6379`;
-  console.log(isProduction());
   if (!host || !port || !password || !username)
     throw new Error("please check your redis env variables");
   return `redis://${username}:${password}@${host}:${port}`;

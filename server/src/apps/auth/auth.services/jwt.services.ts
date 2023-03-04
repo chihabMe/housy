@@ -3,7 +3,6 @@ import { accessTokenMaxAge, refreshTokenMaxAge } from "../../../core/constants";
 import env from "../../../core/env";
 
 export const generateAuthTokens = (user_id: string) => {
-  console.log(accessTokenMaxAge);
   const accessToken = jwt.sign({ user_id }, env.getAccessSecret(), {
     expiresIn: accessTokenMaxAge,
   });

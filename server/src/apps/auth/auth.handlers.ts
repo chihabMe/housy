@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import httpStatus, { BAD_REQUEST } from "http-status";
 import { ACCESS_COOKIE_NAME, REFRESH_COOKIE_NAME } from "../../core/constants";
 import prisma from "../../core/prisma";
-import redis_client from "../../core/redis_clinet";
+import redis_client from "../../core/redis_client";
 import {
   generateAuthTokens,
   setAuthCookies,
@@ -55,13 +55,23 @@ export const obtainTokenHandler = async (
     // generate an access and refresh token
     const tokens = generateAuthTokens(user.id);
     //store the refresh token in redis by using the user id as a key
-    redis_client.set(user.id, tokens.refreshToken);
+    await redis_client.set(user.id, tokens.refreshToken);
     //set the authentication headers for the response
     setAuthCookies({
       res,
       access: tokens.accessToken,
       refresh: tokens.refreshToken,
     });
+    //just fot testing
+    if (process.env.MODE == "testing")
+      return res.status(httpStatus.OK).json({
+        success: true,
+        tokens: {
+          refresh: `Bearer ${tokens.refreshToken}`,
+          access: `Bearer ${tokens.accessToken}`,
+        },
+        message: "refreshed",
+      });
     //return success response
     return res.status(httpStatus.OK).json({
       success: true,
@@ -107,6 +117,7 @@ export const refreshTokenHandler = async (
     //get the stored refresh token form redis
     const currentStoredRefreshToken = await redis_client.get(decoded.user_id);
     //compare the relieved refresh token and the one stored in redis
+
     if (!currentStoredRefreshToken || refresh != currentStoredRefreshToken)
       //the refresh tokens are not the same thats mean the reviewed one is not whitelisted
       //return 400 bad request error and blacklisted token error
@@ -120,16 +131,31 @@ export const refreshTokenHandler = async (
       });
     //if the they are the same
     //generated new access/refresh tokens by using the decoded user_id
-    const tokens = generateAuthTokens(decoded.user_id);
+    let tokens;
+    //to avoid generating the same token in the testing mode
+    do {
+      tokens = generateAuthTokens(decoded.user_id);
+    } while (tokens.refreshToken == refresh && process.env.MODE == "testing");
     //store the new refresh token in redis by using the user_id as a key
     // await redis_client.set(decoded.user_id, tokens.refreshToken);
-    redis_client.set(decoded.user_id, tokens.refreshToken);
+    await redis_client.set(decoded.user_id, tokens.refreshToken);
     //set new signed cooked that contains  new a refresh token and a new access token
     setAuthCookies({
       res,
       refresh: tokens.refreshToken,
       access: tokens.accessToken,
     });
+    //just fot testing
+    if (process.env.MODE == "testing")
+      return res.status(httpStatus.OK).json({
+        success: true,
+        tokens: {
+          refresh: `Bearer ${tokens.refreshToken}`,
+          access: `Bearer ${tokens.accessToken}`,
+        },
+        message: "refreshed",
+      });
+
     //return success
     return res
       .status(httpStatus.OK)
@@ -162,7 +188,7 @@ export const logoutTokenHandler = async (req: Request, res: Response) => {
   //if the refresh token is valid
   //delete it from redis by using the user_id as a key
   // await redis_client.del(decoded.user_id);
-  redis_client.del(decoded.user_id);
+  await redis_client.del(decoded.user_id);
   //delete the auth cookies
   res.clearCookie(REFRESH_COOKIE_NAME);
   res.clearCookie(ACCESS_COOKIE_NAME);

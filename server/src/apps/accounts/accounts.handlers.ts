@@ -9,7 +9,7 @@ import {
   registrationSchema,
 } from "../../libs/schemas/accounts";
 import { sendAccountActivationEmail, sendMail } from "../../libs/email";
-import redis_client from "../../core/redis_clinet";
+import redis_client from "../../core/redis_client";
 import {
   compareUserPassword,
   generateActivationEmail,

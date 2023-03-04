@@ -5,7 +5,7 @@ import {
   TOKEN_EXPIRES_TIME,
 } from "../../core/constants";
 import env from "../../core/env";
-import redis_client from "../../core/redis_clinet";
+import redis_client from "../../core/redis_client";
 import {
   generateCanRequestAnotherTokenRedisKey,
   prefixActivationToken,
