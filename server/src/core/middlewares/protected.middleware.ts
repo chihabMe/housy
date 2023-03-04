@@ -10,8 +10,10 @@ const protectedRouteMiddleware = async (
   res: Response,
   next: NextFunction
 ) => {
-  const access =
+  let access: string =
     req.signedCookies[ACCESS_COOKIE_NAME] ?? req.headers[ACCESS_COOKIE_NAME];
+  if (!access) return res.sendStatus(httpStatus.UNAUTHORIZED);
+  access = access.split(" ")[1];
   const decoded = validateAccessToken(access);
   if (!decoded) return res.sendStatus(httpStatus.UNAUTHORIZED);
   try {

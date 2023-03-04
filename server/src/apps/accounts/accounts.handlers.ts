@@ -65,11 +65,13 @@ export const accountsRegisterHandler = async (
     });
     console.log(activationURI);
     //send the token as a  confirmation email to the user
-    await sendAccountActivationEmail({
-      subject: "account activation email",
-      html: generateActivationEmail({ activationURI }),
-      to: email,
-    });
+    try {
+      await sendAccountActivationEmail({
+        subject: "account activation email",
+        html: generateActivationEmail({ activationURI }),
+        to: email,
+      });
+    } catch (err) {}
     //to store the use for asking many activation links in a short time
     await storeThatThisUserAskedForAToken(user.id);
     //return success status and the user data
@@ -206,12 +208,14 @@ export const generateAccountActivationEmailHandler = async (
       token: activationToken.token,
     });
     console.log(activationURI);
-    //send the token as a  confirmation email to the user
-    await sendAccountActivationEmail({
-      subject: "account activation email",
-      html: generateActivationEmail({ activationURI }),
-      to: user.email,
-    });
+    try {
+      //send the token as a  confirmation email to the user
+      await sendAccountActivationEmail({
+        subject: "account activation email",
+        html: generateActivationEmail({ activationURI }),
+        to: user.email,
+      });
+    } catch (err) {}
 
     res.status(httpStatus.OK).json("please check your email");
   } catch (err) {

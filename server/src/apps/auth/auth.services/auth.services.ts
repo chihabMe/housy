@@ -33,6 +33,6 @@ export const setAuthCookies = ({
   access: string;
   res: Response;
 }) => {
-  res.cookie(REFRESH_COOKIE_NAME, refresh, refreshCookieOptions);
-  res.cookie(ACCESS_COOKIE_NAME, access, accessCookieOptions);
+  res.cookie(REFRESH_COOKIE_NAME, `Bearer ${refresh}`, refreshCookieOptions);
+  res.cookie(ACCESS_COOKIE_NAME, `Bearer ${access}`, accessCookieOptions);
 };

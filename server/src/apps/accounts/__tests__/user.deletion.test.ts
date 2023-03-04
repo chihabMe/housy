@@ -4,7 +4,12 @@ import prisma from "../../../core/prisma";
 import { redis_client_connect } from "../../../core/redis_clinet";
 import { hasher } from "../../../libs/hasher";
 import { createServer } from "../../../server";
-import { createUserInteractor, findUserByEmail } from "../accounts.interactors";
+import { generateAuthTokens } from "../../auth/auth.services";
+import {
+  createUserInteractor,
+  findUserByEmail,
+  updateUserInteractor,
+} from "../accounts.interactors";
 import { getUserIdFromRedisUsingTheActionToken } from "../accounts.services";
 const app = createServer();
 const userCredentials = {
@@ -14,12 +19,15 @@ const userCredentials = {
   active: true,
   verified: true,
 };
+let jwt = "";
 beforeAll(async () => {
   await redis_client_connect();
-  await createUserInteractor({
+  const user = await createUserInteractor({
     ...userCredentials,
     password: hasher(userCredentials.password),
   });
+  await updateUserInteractor({ userId: user.id, active: true, verified: true });
+  jwt = generateAuthTokens(user.id).accessToken;
 });
 afterAll(async () => {
   await prisma.user.deleteMany();
@@ -35,13 +43,18 @@ describe("user deletion", () => {
     const user = await findUserByEmail(userCredentials.email);
     const activationURI = getUserIdFromRedisUsingTheActionToken;
     //login
-    let response = await supertest(app).post("/api/v1/auth/token/obtain").send({
-      email: userCredentials.email,
-      password: userCredentials.password,
-    });
-    console.log(user);
-    console.log(response.body);
-    console.log(response.headers);
-    expect(response.status).toEqual(200);
+    let loginResponse = await supertest(app)
+      .post("/api/v1/auth/token/obtain")
+      .send({
+        email: userCredentials.email,
+        password: userCredentials.password,
+      });
+
+    expect(loginResponse.status).toEqual(200);
+    const deletionResponse = await await supertest(app)
+      .delete("/api/v1/accounts/")
+      .set({ authorization: `Bearer ${jwt}` });
+    console.log(deletionResponse.body);
+    expect(deletionResponse.status).toEqual(200);
   });
 });

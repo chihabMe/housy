@@ -76,8 +76,11 @@ export const refreshTokenHandler = async (
   next: NextFunction
 ) => {
   //get the refresh token from the header or the cookie
-  const refresh = (req.headers[REFRESH_COOKIE_NAME] ||
+  let refresh = (req.headers[REFRESH_COOKIE_NAME] ||
     req.signedCookies[REFRESH_COOKIE_NAME]) as string;
+  if (!refresh)
+    return res.status(httpStatus.BAD_REQUEST).json("invalid refresh token");
+  refresh = refresh.split(" ")[1];
   //decode the refresh token and return its values
   const decoded = validateRefreshToken(refresh);
   //if decoded ==null return an error
