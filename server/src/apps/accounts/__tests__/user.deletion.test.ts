@@ -54,7 +54,12 @@ describe("user deletion", () => {
     const deletionResponse = await await supertest(app)
       .delete("/api/v1/accounts/")
       .set({ authorization: `Bearer ${jwt}` });
-    console.log(deletionResponse.body);
     expect(deletionResponse.status).toEqual(200);
+  });
+  //the user.active should be false
+  it("should be inactive ", async () => {
+    const user = await findUserByEmail(userCredentials.email);
+    expect(user?.active).toEqual(false);
+    expect(user?.verified).toEqual(true);
   });
 });

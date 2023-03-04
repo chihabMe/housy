@@ -27,7 +27,7 @@ accountsRouter.get("/me", protectedRouteMiddleware, accountsMeHandler);
 accountsRouter.post("/restore/password", accountsRestorePasswordHandler);
 
 accountsRouter.delete("/", protectedRouteMiddleware, accountsDeleteHandler);
-accountsRouter.post("/activate/:token", accountsActivateHandler);
+accountsRouter.get("/activate/:token", accountsActivateHandler);
 accountsRouter.post(
   "/generate-token/",
   zodValidatorMiddleware(accountActivationSchema),

@@ -32,16 +32,24 @@ export const obtainTokenHandler = async (
     if (!user || !bcrypt.compareSync(password, user.password))
       return res.status(httpStatus.BAD_REQUEST).json({
         success: false,
-        type: "invalidCredentials",
-        error: "please check your email and password and try again",
+        errors: {
+          fields: {
+            email: "invalid email",
+            password: "invalid password",
+          },
+          form: "please check your email and password and try again",
+        },
       });
 
     if (!user.verified || !user.active)
       return res.status(BAD_REQUEST).json({
         success: false,
-        type: "unverifiedEmail",
-        error:
-          "you need to verify your email to activate your account please check your email box for the activation email if you didn't receive any emails you can request a new activation email ",
+        errors: {
+          fields: {
+            email: "unverified email",
+          },
+          form: "you need to verify your email to activate your account please check your email box for the activation email if you didn't receive any emails you can request a new activation email ",
+        },
       });
     // if the user credentials are valid
     // generate an access and refresh token
@@ -57,6 +65,7 @@ export const obtainTokenHandler = async (
     //return success response
     return res.status(httpStatus.OK).json({
       success: true,
+      message: "you are logged in",
     });
   } catch (err) {
     //pass the error to the errors handler middleware
@@ -79,7 +88,14 @@ export const refreshTokenHandler = async (
   let refresh = (req.headers[REFRESH_COOKIE_NAME] ||
     req.signedCookies[REFRESH_COOKIE_NAME]) as string;
   if (!refresh)
-    return res.status(httpStatus.BAD_REQUEST).json("invalid refresh token");
+    return res.status(httpStatus.BAD_REQUEST).json({
+      success: false,
+      errors: {
+        fields: {
+          refresh: "invalid refresh token",
+        },
+      },
+    });
   refresh = refresh.split(" ")[1];
   //decode the refresh token and return its values
   const decoded = validateRefreshToken(refresh);
@@ -94,9 +110,14 @@ export const refreshTokenHandler = async (
     if (!currentStoredRefreshToken || refresh != currentStoredRefreshToken)
       //the refresh tokens are not the same thats mean the reviewed one is not whitelisted
       //return 400 bad request error and blacklisted token error
-      return res
-        .status(httpStatus.BAD_REQUEST)
-        .json("blacklisted refresh token");
+      return res.status(httpStatus.BAD_REQUEST).json({
+        success: false,
+        errors: {
+          fields: {
+            refresh: "blacklisted refresh token",
+          },
+        },
+      });
     //if the they are the same
     //generated new access/refresh tokens by using the decoded user_id
     const tokens = generateAuthTokens(decoded.user_id);
@@ -110,7 +131,9 @@ export const refreshTokenHandler = async (
       access: tokens.accessToken,
     });
     //return success
-    return res.status(httpStatus.OK).json({ status: "success" });
+    return res
+      .status(httpStatus.OK)
+      .json({ success: true, message: "refreshed" });
   } catch (err) {
     //pass the error to the 500 handler middleware
     next(err);

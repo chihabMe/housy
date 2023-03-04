@@ -6,6 +6,8 @@ interface CreateUserInteractorInputs {
   email: string;
   username: string;
   password: string;
+  active?: boolean;
+  verified?: boolean;
 }
 export const createUserInteractor = async (
   inputs: CreateUserInteractorInputs
@@ -15,6 +17,8 @@ export const createUserInteractor = async (
       email: inputs.email,
       username: inputs.username,
       password: inputs.password,
+      verified: inputs.verified,
+      active: inputs.verified,
     },
   });
 };

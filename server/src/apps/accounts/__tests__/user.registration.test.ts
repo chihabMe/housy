@@ -19,7 +19,8 @@ describe("user registration", () => {
   afterAll(async () => {
     const deleteUsers = prisma.user.deleteMany();
     const deleteProfiles = prisma.profile.deleteMany();
-    await prisma.$transaction([deleteUsers, deleteProfiles]);
+    const deleteTokens = prisma.token.deleteMany();
+    await prisma.$transaction([deleteUsers, deleteProfiles, deleteTokens]);
     await prisma.$disconnect();
   });
   //test the registration endpoint
@@ -31,10 +32,11 @@ describe("user registration", () => {
     it("it should return 400 with required fields error ", async () => {
       const response = await supertest(app).post(`/api/v1/accounts`);
       expect(response.status).toBe(400);
-      expect(response.body.fieldErrors.username[0]).toEqual("Required");
-      expect(response.body.fieldErrors.email[0]).toEqual("Required");
-      expect(response.body.fieldErrors.password[0]).toEqual("Required");
-      expect(response.body.fieldErrors.rePassword[0]).toEqual("Required");
+      expect(response.body.success).toEqual(false);
+      expect(response.body.errors.fields.username[0]).toEqual("Required");
+      expect(response.body.errors.fields.email[0]).toEqual("Required");
+      expect(response.body.errors.fields.password[0]).toEqual("Required");
+      expect(response.body.errors.fields.rePassword[0]).toEqual("Required");
     });
     it("it should return 200 success status with the user email,id,username ", async () => {
       const response = await supertest(app)

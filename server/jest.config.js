@@ -5,6 +5,5 @@ module.exports = {
   verbose: true,
   silent: false,
   forceExit: true,
-  silent: false,
   testMatch: ["**/apps/**/__tests__/*.test.ts", "**/core/tests/*.test.ts"],
 };
