@@ -14,6 +14,7 @@ export const generateAuthTokens = (user_id: string) => {
 
 export const validateAccessToken = (token: string) => {
   if (!token) return null;
+  token = token.split(" ")[1];
   try {
     const decoded = jwt.verify(
       token,
@@ -26,6 +27,7 @@ export const validateAccessToken = (token: string) => {
 };
 export const validateRefreshToken = (token: string) => {
   if (!token) return null;
+  token = token.split(" ")[1];
   try {
     const decoded = jwt.verify(
       token,

@@ -182,7 +182,9 @@ export const logoutTokenHandler = async (req: Request, res: Response) => {
   const refresh = (req.headers[REFRESH_COOKIE_NAME] ??
     req.signedCookies[REFRESH_COOKIE_NAME]) as string;
   //if there is no token or the token is invalid return 400 error invalid refresh token
+  console.log(refresh);
   const decoded = validateRefreshToken(refresh);
+  console.log(decoded);
   if (!decoded)
     return res.status(httpStatus.BAD_REQUEST).json("invalid refresh token");
   //if the refresh token is valid

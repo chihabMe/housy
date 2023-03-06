@@ -12,10 +12,17 @@ const protectedRouteMiddleware = async (
 ) => {
   let access: string =
     req.signedCookies[ACCESS_COOKIE_NAME] ?? req.headers[ACCESS_COOKIE_NAME];
-  if (!access) return res.sendStatus(httpStatus.UNAUTHORIZED);
-  access = access.split(" ")[1];
   const decoded = validateAccessToken(access);
-  if (!decoded) return res.sendStatus(httpStatus.UNAUTHORIZED);
+  if (!decoded)
+    return res.status(httpStatus.UNAUTHORIZED).json({
+      success: false,
+      errors: {
+        message: `an ${ACCESS_COOKIE_NAME} token cookie or header is required `,
+        fields: {
+          refresh: "Required",
+        },
+      },
+    });
   try {
     const user = await prisma.user.findFirst({
       where: {

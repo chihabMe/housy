@@ -36,9 +36,9 @@ export const accountsRegisterHandler = async (
   res: Response,
   next: NextFunction
 ) => {
+  //extracting the registration fields
   //(this route is being validated by zod validator middleware)
   //so those values are insured to be  stored in the req.body
-  //extracting the registration fields
   const { email, password, username } = req.body;
   try {
     //create a user and store it in the database
