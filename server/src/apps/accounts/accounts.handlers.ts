@@ -72,8 +72,7 @@ export const accountsRegisterHandler = async (
     //return success status and the user data
     res.status(httpStatus.CREATED).json(
       jsonRepose.success({
-        message: "activated",
-        data: { username: user.username, email: user.email, id: user.id },
+        message: "please check your email for the activation link",
       })
     );
   } catch (err) {
@@ -204,7 +203,7 @@ export const generateAccountActivationEmailHandler = async (
     if (!user || user.active)
       return res.status(200).json(
         jsonRepose.success({
-          message: "please check your email fo the activation email",
+          message: "please check your email for the activation link",
         })
       );
     const canGenerateAnotherToken = await redis_client.get(
@@ -241,9 +240,11 @@ export const generateAccountActivationEmailHandler = async (
       });
     } catch (err) {}
 
-    res
-      .status(httpStatus.OK)
-      .json(jsonRepose.success({ message: "please check your email" }));
+    res.status(httpStatus.OK).json(
+      jsonRepose.success({
+        message: "please check your email for the activation link",
+      })
+    );
   } catch (err) {
     next(err);
   }

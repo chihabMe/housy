@@ -5,6 +5,7 @@ import { redis_client_connect } from "../../../core/redis_client";
 import { hasher } from "../../../libs/hasher";
 import { extractAuthCookiesFromHeaders } from "../../../libs/helpers/headers.helpers";
 import sleep from "../../../libs/helpers/sleep";
+import jsonRepose from "../../../libs/jsonResponse";
 import { createServer } from "../../../server";
 import { createUserInteractor } from "../../accounts/accounts.interactors";
 
@@ -39,10 +40,15 @@ describe("test refreshing the token", () => {
     it("should return 400 error with invalid refresh token error ", async () => {
       const response = await supertest(app).post("/api/v1/auth/token/refresh");
       expect(response.status).toEqual(400);
-      expect(response.body.success).toBe(false);
-      expect(response.body.errors.fields.refresh).toEqual(
-        "invalid refresh token"
-      );
+      expect(response.body).toEqual({
+        success: false,
+        message: "invalid refresh token",
+        errors: {
+          fields: {
+            refresh: ["Invalid"],
+          },
+        },
+      });
     });
   });
   //this variable i will use to to store a dead refresh token
@@ -71,13 +77,10 @@ describe("test refreshing the token", () => {
         },
         message: "you are logged in",
       });
-      console.log(obtainTokensResponse.body);
       const headers = { refresh: obtainTokensResponse.body.tokens.refresh };
-      console.log(headers);
       const refreshResponse = await request
         .post("/api/v1/auth/token/refresh")
         .set(headers);
-      console.log("refresh body ", refreshResponse.body);
       expect(refreshResponse.status).toEqual(200);
       expect(refreshResponse.body).toEqual({
         success: true,
@@ -93,15 +96,11 @@ describe("test refreshing the token", () => {
         refresh: expect.any(String),
       });
       //store the  dead refresh token that
-      console.log("body", obtainTokensResponse.body);
       storedRefreshToken = obtainTokensResponse.body.tokens.refresh;
-
-      console.log(refreshResponse.body.tokens.refresh);
     });
   });
   describe("trying to refresh with a  refresh has been used before", () => {
     it("should return 400 error with blacklisted token error", async () => {
-      console.log("stored,", storedRefreshToken);
       const refreshResponse = await request
         .post("/api/v1/auth/token/refresh")
         .set({ refresh: storedRefreshToken });

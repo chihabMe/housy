@@ -42,8 +42,11 @@ describe("user registration", () => {
       const response = await supertest(app)
         .post(`/api/v1/accounts`)
         .send(userCredentials);
-      expect(response.body.username).toEqual(userCredentials.username);
-      expect(response.body.email).toEqual(userCredentials.email);
+      console.log(response.body);
+      expect(response.body).toEqual({
+        success: true,
+        message: "please check your email for the activation link",
+      });
     });
     //test number of users in the database
     it("it should be user ", async () => {

@@ -10,6 +10,8 @@ import {
 } from "./auth.services";
 import bcrypt from "bcrypt";
 import { findUserByEmailInterector } from "../accounts/accounts.interactors";
+import jsonRepose from "../../libs/jsonResponse";
+import sleep from "../../libs/helpers/sleep";
 
 export const obtainTokenHandler = async (
   req: Request<{}, {}, { email: string; password: string }>,
@@ -93,28 +95,28 @@ export const refreshTokenHandler = async (
   //get the refresh token from the header or the cookie
   let refresh = (req.headers[REFRESH_COOKIE_NAME] ||
     req.signedCookies[REFRESH_COOKIE_NAME]) as string;
-  if (!refresh)
-    return res.status(httpStatus.BAD_REQUEST).json({
-      success: false,
-      errors: {
-        fields: {
-          refresh: "invalid refresh token",
-        },
-      },
-    });
-  refresh = refresh.split(" ")[1];
-  //decode the refresh token and return its values
   const decoded = validateRefreshToken(refresh);
   //if decoded ==null return an error
   if (!decoded)
-    return res.status(httpStatus.BAD_REQUEST).json("invalid refresh token");
+    return res.status(httpStatus.BAD_REQUEST).json(
+      jsonRepose.error({
+        message: "invalid refresh token",
+        errors: {
+          fields: {
+            refresh: ["Invalid"],
+          },
+        },
+      })
+    );
+
   //this try will handle if redis connection failed
   try {
+    const token = refresh.split(" ")[1];
     //get the stored refresh token form redis
     const currentStoredRefreshToken = await redis_client.get(decoded.user_id);
     //compare the relieved refresh token and the one stored in redis
 
-    if (!currentStoredRefreshToken || refresh != currentStoredRefreshToken)
+    if (!currentStoredRefreshToken || token != currentStoredRefreshToken)
       //the refresh tokens are not the same thats mean the reviewed one is not whitelisted
       //return 400 bad request error and blacklisted token error
       return res.status(httpStatus.BAD_REQUEST).json({
@@ -131,7 +133,10 @@ export const refreshTokenHandler = async (
     //to avoid generating the same token in the testing mode
     do {
       tokens = generateAuthTokens(decoded.user_id);
-    } while (tokens.refreshToken == refresh && process.env.MODE == "testing");
+    } while (
+      tokens.refreshToken == currentStoredRefreshToken &&
+      process.env.MODE == "testing"
+    );
     //store the new refresh token in redis by using the user_id as a key
     // await redis_client.set(decoded.user_id, tokens.refreshToken);
     await redis_client.set(decoded.user_id, tokens.refreshToken);
@@ -182,7 +187,14 @@ export const logoutTokenHandler = async (req: Request, res: Response) => {
   const decoded = validateRefreshToken(refresh);
   console.log("decoded ", decoded);
   if (!decoded)
-    return res.status(httpStatus.BAD_REQUEST).json("invalid refresh token");
+    return res.status(httpStatus.BAD_REQUEST).json(
+      jsonRepose.error({
+        message: "invalid refresh token",
+        errors: {
+          refresh,
+        },
+      })
+    );
   //if the refresh token is valid
   //delete it from redis by using the user_id as a key
   // await redis_client.del(decoded.user_id);
