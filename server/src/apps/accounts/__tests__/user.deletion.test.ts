@@ -7,7 +7,7 @@ import { createServer } from "../../../server";
 import { generateAuthTokens } from "../../auth/auth.services";
 import {
   createUserInteractor,
-  findUserByEmail,
+  findUserByEmailInterector,
   updateUserInteractor,
 } from "../accounts.interactors";
 import { getUserIdFromRedisUsingTheActionToken } from "../accounts.services";
@@ -40,7 +40,7 @@ describe("user deletion", () => {
   });
   //inactivating the user
   it("should make the user inactive", async () => {
-    const user = await findUserByEmail(userCredentials.email);
+    const user = await findUserByEmailInterector(userCredentials.email);
     const activationURI = getUserIdFromRedisUsingTheActionToken;
     //login
     let loginResponse = await supertest(app)
@@ -58,7 +58,7 @@ describe("user deletion", () => {
   });
   //the user.active should be false
   it("should be inactive ", async () => {
-    const user = await findUserByEmail(userCredentials.email);
+    const user = await findUserByEmailInterector(userCredentials.email);
     expect(user?.active).toEqual(false);
     expect(user?.verified).toEqual(true);
   });

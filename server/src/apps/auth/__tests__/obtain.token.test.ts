@@ -9,7 +9,7 @@ import { hasher } from "../../../libs/hasher";
 import { createServer } from "../../../server";
 import {
   createUserInteractor,
-  findUserByEmail,
+  findUserByEmailInterector,
   getLastGeneratedTokenFromAUser,
   updateUserInteractor,
 } from "../../accounts/accounts.interactors";
@@ -79,7 +79,7 @@ describe("token obtain", () => {
   //the user entered  valid credentials
   it("should return 200 success with refresh and authorization headers", async () => {
     //activate the user
-    const user = await findUserByEmail(userCredentials.email);
+    const user = await findUserByEmailInterector(userCredentials.email);
     await updateUserInteractor({
       userId: user!.id,
       active: true,

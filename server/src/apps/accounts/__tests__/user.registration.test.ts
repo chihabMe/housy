@@ -2,7 +2,7 @@ import supertest from "supertest";
 import prisma from "../../../core/prisma";
 import { redis_client_connect } from "../../../core/redis_client";
 import { createServer } from "../../../server";
-import { findUserByEmail } from "../accounts.interactors";
+import { findUserByEmailInterector } from "../accounts.interactors";
 
 const app = createServer();
 const userCredentials = {
@@ -51,7 +51,7 @@ describe("user registration", () => {
       expect(numberOfUsers).toBe(1);
     });
     it("it should be unverified and inactive ", async () => {
-      const user = await findUserByEmail(userCredentials.email);
+      const user = await findUserByEmailInterector(userCredentials.email);
       expect(!user).toBeFalsy();
       expect(user!.active).toBe(false);
       expect(user!.verified).toBe(false);

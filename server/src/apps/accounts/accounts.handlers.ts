@@ -12,10 +12,7 @@ import {
   generateActivationURI,
   storeThatThisUserAskedForAToken,
 } from "./accounts.services";
-import {
-  generateCanRequestAnotherTokenRedisKey,
-  prefixActivationToken,
-} from "../../libs/helpers/activation";
+import { generateCanRequestAnotherTokenRedisKey } from "../../libs/helpers/activation";
 import {
   ACCESS_COOKIE_NAME,
   REFRESH_COOKIE_NAME,
@@ -26,7 +23,7 @@ import {
   createUserInteractor,
   deleteTokenById,
   findTokenByToken,
-  findUserByEmail,
+  findUserByEmailInterector,
   getLastGeneratedTokenFromAUser,
   updateUserInteractor,
 } from "./accounts.interactors";
@@ -140,7 +137,6 @@ export const accountsActivateHandler = async (
   }
 };
 
-
 export const accountsChangePassword = async (
   req: Request<{}, {}, TypeOf<typeof passwordChangeSchema>>,
   res: Response
@@ -173,7 +169,7 @@ export const generateAccountActivationEmailHandler = async (
 ) => {
   try {
     const email = req.body.email;
-    const user = await findUserByEmail(email);
+    const user = await findUserByEmailInterector(email);
     let successResponse = "please check your email fo the activation email";
     //to protect the api from exposing the registered users
     //i will alway return a success response
@@ -217,22 +213,25 @@ export const generateAccountActivationEmailHandler = async (
   }
 };
 
-export const accountsUpdateProfileHandler = async (req: Request<{},{},{username?:string}>, res: Response) => {
+export const accountsUpdateProfileHandler = async (
+  req: Request<{}, {}, { username?: string }>,
+  res: Response
+) => {
   //@ts-ignore
   const user = req.user as User;
-  const {username}=req.body;
+  const { username } = req.body;
 
   const updatedUser = await updateUserInteractor({
-    userId:user.id,
+    userId: user.id,
     username,
-  })
+  });
   res.status(httpStatus.OK).json({
-    success:true,
-    message:"updated",
-    data:{
-      id:updatedUser.id,
-      username:updatedUser.username,
-      email:updatedUser.email,
-    }
+    success: true,
+    message: "updated",
+    data: {
+      id: updatedUser.id,
+      username: updatedUser.username,
+      email: updatedUser.email,
+    },
   });
 };

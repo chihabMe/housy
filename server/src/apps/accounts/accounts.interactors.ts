@@ -46,7 +46,7 @@ export const updateUserInteractor = async (inputs: UpdateUserInteractor) => {
   });
 };
 
-export const findUserByEmail = async (email: string) => {
+export const findUserByEmailInterector = async (email: string) => {
   return await prisma.user.findUnique({
     where: {
       email,

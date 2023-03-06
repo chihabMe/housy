@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import httpStatus, { BAD_REQUEST } from "http-status";
 import { ACCESS_COOKIE_NAME, REFRESH_COOKIE_NAME } from "../../core/constants";
-import prisma from "../../core/prisma";
 import redis_client from "../../core/redis_client";
 import {
   generateAuthTokens,
@@ -10,6 +9,7 @@ import {
   validateRefreshToken,
 } from "./auth.services";
 import bcrypt from "bcrypt";
+import { findUserByEmailInterector } from "../accounts/accounts.interactors";
 
 export const obtainTokenHandler = async (
   req: Request<{}, {}, { email: string; password: string }>,
@@ -20,11 +20,7 @@ export const obtainTokenHandler = async (
   const { email, password } = req.body;
   try {
     //try to find a use with this email
-    const user = await prisma.user.findFirst({
-      where: {
-        email,
-      },
-    });
+    const user = await findUserByEmailInterector(email);
     //if there is no use with this email
     // or
     // the entered password is not he same as that user password
