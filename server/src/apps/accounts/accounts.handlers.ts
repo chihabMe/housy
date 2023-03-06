@@ -28,6 +28,7 @@ import {
   updateUserInteractor,
 } from "./accounts.interactors";
 import { passwordChangeSchema, registrationSchema } from "./accounts.schemas";
+import jsonRepose from "../../libs/jsonResponse";
 export const accountsRegisterHandler = async (
   req: Request<{}, {}, TypeOf<typeof registrationSchema>>,
   res: Response,
@@ -69,9 +70,12 @@ export const accountsRegisterHandler = async (
     //to store the use for asking many activation links in a short time
     await storeThatThisUserAskedForAToken(user.id);
     //return success status and the user data
-    res
-      .status(httpStatus.CREATED)
-      .json({ username: user.username, email: user.email, id: user.id });
+    res.status(httpStatus.CREATED).json(
+      jsonRepose.success({
+        message: "activated",
+        data: { username: user.username, email: user.email, id: user.id },
+      })
+    );
   } catch (err) {
     //pass the error to the 500 errors handler middleware
     next(err);
@@ -81,7 +85,12 @@ export const accountsMeHandler = (req: Request, res: Response) => {
   //@ts-ignore
   const user = { ...(req.user as User) };
   const { createdAt, email, id, updatedAt, username } = user;
-  res.status(httpStatus.OK).json({ username, id, updatedAt, createdAt, email });
+  res.status(httpStatus.OK).json(
+    jsonRepose.success({
+      message: "user data",
+      data: { username, id, updatedAt, createdAt, email },
+    })
+  );
 };
 export const accountsDeleteHandler = async (
   req: Request,
@@ -101,7 +110,7 @@ export const accountsDeleteHandler = async (
     res.clearCookie(REFRESH_COOKIE_NAME);
     res.clearCookie(ACCESS_COOKIE_NAME);
 
-    res.status(httpStatus.OK).json({ success: true, message: "deleted" });
+    res.status(httpStatus.OK).json(jsonRepose.success({ message: "deleted" }));
   } catch (err) {
     next(err);
   }
@@ -115,13 +124,20 @@ export const accountsActivateHandler = async (
   const activationToken = req.params.token;
   //if the activationToken is null return 400 error with message
   if (!activationToken)
-    return res.status(httpStatus.BAD_REQUEST).json("invalid token");
+    return res
+      .status(httpStatus.BAD_REQUEST)
+      .json(jsonRepose.error({ message: "invalid token" }));
   try {
     //get the user by using the activation token
     const token = await findTokenByToken(activationToken);
-    if (!token) return res.status(httpStatus.BAD_REQUEST).json("invalid token");
+    if (!token)
+      return res
+        .status(httpStatus.BAD_REQUEST)
+        .json(jsonRepose.error({ message: "invalid token" }));
     if (Date.now() > token.expiresAt)
-      res.status(httpStatus.BAD_REQUEST).json("dead token token");
+      res
+        .status(httpStatus.BAD_REQUEST)
+        .json(jsonRepose.error({ message: "dead token token" }));
     //update the user to be active and verified
     await updateUserInteractor({
       userId: token.userId,
@@ -131,7 +147,9 @@ export const accountsActivateHandler = async (
     //delete the activationToken
     await deleteTokenById(token.id);
     //return success response
-    return res.status(httpStatus.OK).json("activated");
+    return res
+      .status(httpStatus.OK)
+      .json(jsonRepose.success({ message: "activated" }));
   } catch (err) {
     next(err);
   }
@@ -146,14 +164,25 @@ export const accountsChangePassword = async (
   const user = req.user as User;
   //validate the entered password and the user password
   if (!compareUserPassword({ password: oldPassword, hash: user.password }))
-    return res.status(httpStatus.BAD_REQUEST).json("invalid user password");
+    return res.status(httpStatus.BAD_REQUEST).json(
+      jsonRepose.error({
+        message: "invalid credentials",
+        errors: {
+          oldPassword: ["Invalid"],
+        },
+      })
+    );
   //update the user with the hash of the new password
   await updateUserInteractor({
     userId: user.id,
     password: hasher(newPassword),
   });
   //return success response
-  res.status(httpStatus.OK).json("your password has been changed");
+  res.status(httpStatus.OK).json(
+    jsonRepose.success({
+      message: "your password has been changed",
+    })
+  );
 };
 export const accountsChangeEmailHandler = (req: Request, res: Response) => {
   res.status(httpStatus.OK).json("change email");
@@ -170,21 +199,26 @@ export const generateAccountActivationEmailHandler = async (
   try {
     const email = req.body.email;
     const user = await findUserByEmailInterector(email);
-    let successResponse = "please check your email fo the activation email";
     //to protect the api from exposing the registered users
     //i will alway return a success response
-    if (!user || user.active) return res.status(200).json(successResponse);
+    if (!user || user.active)
+      return res.status(200).json(
+        jsonRepose.success({
+          message: "please check your email fo the activation email",
+        })
+      );
     const canGenerateAnotherToken = await redis_client.get(
       generateCanRequestAnotherTokenRedisKey(user.id)
     );
     const lastGeneratedToken = await getLastGeneratedTokenFromAUser(user.id);
     let now = new Date().getTime();
     if (now - lastGeneratedToken.createdAt.getTime() < TOKEN_EXPIRES_TIME)
-      return res
-        .status(httpStatus.BAD_REQUEST)
-        .json(
-          "you asked for an email before please wait 15 mins and try that again"
-        );
+      return res.status(httpStatus.BAD_REQUEST).json(
+        jsonRepose.error({
+          message:
+            "you asked for an email before please wait 15 mins and try that again",
+        })
+      );
     //generate a token for the  user to activate his email
     const activationToken = await createTokenInteractor({
       expiresAt: Date.now() + TOKEN_EXPIRES_TIME,
@@ -207,7 +241,9 @@ export const generateAccountActivationEmailHandler = async (
       });
     } catch (err) {}
 
-    res.status(httpStatus.OK).json("please check your email");
+    res
+      .status(httpStatus.OK)
+      .json(jsonRepose.success({ message: "please check your email" }));
   } catch (err) {
     next(err);
   }
@@ -225,13 +261,14 @@ export const accountsUpdateProfileHandler = async (
     userId: user.id,
     username,
   });
-  res.status(httpStatus.OK).json({
-    success: true,
-    message: "updated",
-    data: {
-      id: updatedUser.id,
-      username: updatedUser.username,
-      email: updatedUser.email,
-    },
-  });
+  res.status(httpStatus.OK).json(
+    jsonRepose.success({
+      message: "updated",
+      data: {
+        id: updatedUser.id,
+        username: updatedUser.username,
+        email: updatedUser.email,
+      },
+    })
+  );
 };
