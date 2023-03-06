@@ -4,10 +4,6 @@ import httpStatus from "http-status";
 import { hasher } from "../../libs/hasher";
 import crypto from "crypto";
 import { User } from "@prisma/client";
-import {
-  passwordChangeSchema,
-  registrationSchema,
-} from "../../libs/schemas/accounts";
 import { sendAccountActivationEmail, sendMail } from "../../libs/email";
 import redis_client from "../../core/redis_client";
 import {
@@ -34,6 +30,7 @@ import {
   getLastGeneratedTokenFromAUser,
   updateUserInteractor,
 } from "./accounts.interactors";
+import { passwordChangeSchema, registrationSchema } from "./accounts.schemas";
 export const accountsRegisterHandler = async (
   req: Request<{}, {}, TypeOf<typeof registrationSchema>>,
   res: Response,

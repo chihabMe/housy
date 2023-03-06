@@ -2,10 +2,6 @@ import { Router } from "express";
 import protectedRouteMiddleware from "../../core/middlewares/protected.middleware";
 import { zodValidatorMiddleware } from "../../core/middlewares/zod.middleware";
 import {
-  passwordChangeSchema,
-  registrationSchema,
-} from "../../libs/schemas/accounts";
-import {
   accountsActivateHandler,
   accountsChangeEmailHandler,
   accountsChangePassword,
@@ -15,7 +11,11 @@ import {
   accountsRestorePasswordHandler,
   generateAccountActivationEmailHandler,
 } from "./accounts.handlers";
-import { accountActivationSchema } from "./accounts.schemas";
+import {
+  accountActivationSchema,
+  passwordChangeSchema,
+  registrationSchema,
+} from "./accounts.schemas";
 
 export const accountsRouter = Router();
 accountsRouter.post(

@@ -97,7 +97,6 @@ describe("test refreshing the token", () => {
   });
   describe("trying to refresh with a  refresh has been used before", () => {
     it("should return 400 error with blacklisted token error", async () => {
-      await sleep(1000);
       const refreshResponse = await request
         .post("/api/v1/auth/token/refresh")
         .set({ refresh: storedRefreshToken });

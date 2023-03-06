@@ -101,6 +101,6 @@ describe("token obtain", () => {
     expect(access[1]).not.toEqual("");
     expect(response.status).toEqual(200);
     expect(response.body.success).toEqual(true);
-    expect(response.body.message).toEqual("you are logged in");
+    expect(response.body.message).toEqual("token obtained");
   });
 });

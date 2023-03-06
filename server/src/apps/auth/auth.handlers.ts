@@ -70,7 +70,7 @@ export const obtainTokenHandler = async (
           refresh: `Bearer ${tokens.refreshToken}`,
           access: `Bearer ${tokens.accessToken}`,
         },
-        message: "refreshed",
+        message: "token obtained",
       });
     //return success response
     return res.status(httpStatus.OK).json({
