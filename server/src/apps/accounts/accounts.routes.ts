@@ -10,6 +10,7 @@ import {
   accountsRegisterHandler,
   accountsRestorePasswordHandler,
   generateAccountActivationEmailHandler,
+  accountsUpdateProfileHandler
 } from "./accounts.handlers";
 import {
   accountActivationSchema,
@@ -23,10 +24,11 @@ accountsRouter.post(
   zodValidatorMiddleware(registrationSchema),
   accountsRegisterHandler
 );
+accountsRouter.delete("/", protectedRouteMiddleware, accountsDeleteHandler);
+accountsRouter.put("/",accountsUpdateProfileHandler);
 accountsRouter.get("/me", protectedRouteMiddleware, accountsMeHandler);
 accountsRouter.post("/restore/password", accountsRestorePasswordHandler);
 
-accountsRouter.delete("/", protectedRouteMiddleware, accountsDeleteHandler);
 accountsRouter.get("/activate/:token", accountsActivateHandler);
 accountsRouter.post(
   "/generate-token/",

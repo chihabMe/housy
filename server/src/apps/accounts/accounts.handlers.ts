@@ -140,9 +140,6 @@ export const accountsActivateHandler = async (
   }
 };
 
-export const accountsUpdateProfileHandler = (req: Request, res: Response) => {
-  res.status(httpStatus.OK).json("update profile");
-};
 
 export const accountsChangePassword = async (
   req: Request<{}, {}, TypeOf<typeof passwordChangeSchema>>,
@@ -218,4 +215,24 @@ export const generateAccountActivationEmailHandler = async (
   } catch (err) {
     next(err);
   }
+};
+
+export const accountsUpdateProfileHandler = async (req: Request<{},{},{username?:string}>, res: Response) => {
+  //@ts-ignore
+  const user = req.user as User;
+  const {username}=req.body;
+
+  const updatedUser = await updateUserInteractor({
+    userId:user.id,
+    username,
+  })
+  res.status(httpStatus.OK).json({
+    success:true,
+    message:"updated",
+    data:{
+      id:updatedUser.id,
+      username:updatedUser.username,
+      email:updatedUser.email,
+    }
+  });
 };

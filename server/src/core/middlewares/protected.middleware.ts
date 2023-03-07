@@ -2,6 +2,7 @@ import { User } from "@prisma/client";
 import { Request, Response, NextFunction } from "express";
 import httpStatus from "http-status";
 import { validateAccessToken } from "../../apps/auth/auth.services";
+import jsonRepose from "../../libs/jsonResponse";
 import { ACCESS_COOKIE_NAME } from "../constants";
 import prisma from "../prisma";
 
@@ -14,15 +15,15 @@ const protectedRouteMiddleware = async (
     req.signedCookies[ACCESS_COOKIE_NAME] ?? req.headers[ACCESS_COOKIE_NAME];
   const decoded = validateAccessToken(access);
   if (!decoded)
-    return res.status(httpStatus.UNAUTHORIZED).json({
-      success: false,
-      errors: {
+    return res.status(httpStatus.UNAUTHORIZED).json(
+      jsonRepose.error({
         message: `an ${ACCESS_COOKIE_NAME} token cookie or header is required `,
-        fields: {
+        errors: {
           refresh: "Required",
         },
-      },
-    });
+      })
+    );
+
   try {
     const user = await prisma.user.findFirst({
       where: {

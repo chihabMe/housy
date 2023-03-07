@@ -70,7 +70,7 @@ export const obtainTokenHandler = async (
           refresh: `Bearer ${tokens.refreshToken}`,
           access: `Bearer ${tokens.accessToken}`,
         },
-        message: "token obtained",
+        message: "you are logged in",
       });
     //return success response
     return res.status(httpStatus.OK).json({
@@ -184,7 +184,7 @@ export const logoutTokenHandler = async (req: Request, res: Response) => {
   //if there is no token or the token is invalid return 400 error invalid refresh token
   console.log(refresh);
   const decoded = validateRefreshToken(refresh);
-  console.log(decoded);
+  console.log("decoded ", decoded);
   if (!decoded)
     return res.status(httpStatus.BAD_REQUEST).json("invalid refresh token");
   //if the refresh token is valid

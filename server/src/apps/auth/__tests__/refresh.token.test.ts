@@ -69,12 +69,15 @@ describe("test refreshing the token", () => {
           refresh: expect.any(String),
           access: expect.any(String),
         },
-        message: "refreshed",
+        message: "you are logged in",
       });
+      console.log(obtainTokensResponse.body);
+      const headers = { refresh: obtainTokensResponse.body.tokens.refresh };
+      console.log(headers);
       const refreshResponse = await request
         .post("/api/v1/auth/token/refresh")
-        .set({ refresh: obtainTokensResponse.body.tokens.refresh });
-      console.log(refreshResponse.body);
+        .set(headers);
+      console.log("refresh body ", refreshResponse.body);
       expect(refreshResponse.status).toEqual(200);
       expect(refreshResponse.body).toEqual({
         success: true,
@@ -90,13 +93,15 @@ describe("test refreshing the token", () => {
         refresh: expect.any(String),
       });
       //store the  dead refresh token that
+      console.log("body", obtainTokensResponse.body);
       storedRefreshToken = obtainTokensResponse.body.tokens.refresh;
-      console.log(storedRefreshToken);
+
       console.log(refreshResponse.body.tokens.refresh);
     });
   });
   describe("trying to refresh with a  refresh has been used before", () => {
     it("should return 400 error with blacklisted token error", async () => {
+      console.log("stored,", storedRefreshToken);
       const refreshResponse = await request
         .post("/api/v1/auth/token/refresh")
         .set({ refresh: storedRefreshToken });
