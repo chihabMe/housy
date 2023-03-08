@@ -42,7 +42,6 @@ describe("user registration", () => {
       const response = await supertest(app)
         .post(`/api/v1/accounts`)
         .send(userCredentials);
-      console.log(response.body);
       expect(response.body).toEqual({
         success: true,
         message: "please check your email for the activation link",
