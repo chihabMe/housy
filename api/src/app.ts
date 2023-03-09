@@ -11,6 +11,7 @@ const runServer = async () => {
     .then(async () => {
       const app = createServer();
       app.get("*", (req, res) => handler(req, res));
+      app.get("/api/v1/hello", (req, res) => res.json("hello world"));
       await redis_client_connect();
       app.listen(env.PORT, () => {
         console.log(`running the server on port ${env.PORT}`);

@@ -6,7 +6,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "dev": "dotenv -e .env.development   nodemon ./api/src/app.ts",
+    "dev:api": "dotenv -e .env.development   nodemon ./api/src/app.ts",
+    "dev:next": "next dev",
     "test": "dotenv -e .env.test  -- jest -i ",
     "prisma": "dotenv -e .env.development -- prisma   ",
     "migrate:test": "dotenv -e .env.test -- pnpm prisma migrate deploy"
