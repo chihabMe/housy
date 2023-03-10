@@ -7,18 +7,32 @@ import _500 from "./core/middlewares/500.middleware";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import next from "next";
+import { parse } from "url";
 // import { promisify } from "util";
 // const readFilesAsync = promisify(readFile);
 
 export const createServer = () => {
   // const key = fs.readFileSync(__dirname + "/ssl/housy.pem");
   // const cert = fs.readFileSync(__dirname + "/ssl/housy.crt");
-
-  const app = express();
-  registerMiddlewares(app);
-  registerApps(app);
-  registerErrorsMiddlewares(app);
-  return app;
+  const nextApp = next({ dev: !env.isProduction() });
+  const handle = nextApp.getRequestHandler();
+  return nextApp
+    .prepare()
+    .then(async () => {
+      const app = express();
+      registerMiddlewares(app);
+      registerApps(app);
+      app.get("*", async (req, res) => {
+        const parsedUrl = parse(req.url, true);
+        return await handle(req, res, parsedUrl);
+      });
+      registerErrorsMiddlewares(app);
+      return app;
+    })
+    .catch((err) => {
+      console.error(err);
+      process.exit(1);
+    });
 };
 
 const registerApps = (app: Express) => {

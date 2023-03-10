@@ -6,11 +6,6 @@ import { useEffect } from "react";
 import { date } from "zod";
 
 export default function Home() {
-  useEffect(() => {
-    fetch("/api/v1/hello")
-      .then((res) => res.json())
-      .then((data) => console.log(data));
-  }, []);
   return (
     <>
       <Head>
