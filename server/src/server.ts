@@ -36,6 +36,7 @@ export const createServer = () => {
 };
 
 const registerApps = (app: Express) => {
+  app.get("/api/v1/hello", (req, res) => res.status(200).json("hello world"));
   app.use("/api/v1/auth", authRouter);
   app.use("/api/v1/accounts", accountsRouter);
 };

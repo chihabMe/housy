@@ -1,7 +1,15 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 const hello = () => {
-  return <div>hello</div>;
+  const [data, setData] = useState<any | null>(null);
+  useEffect(() => {
+    fetch("/api/v1/hello")
+      .then((res) => res.json())
+      .then((d) => {
+        setData(d);
+      });
+  }, []);
+  return <div>{data}</div>;
 };
 
 export default hello;
