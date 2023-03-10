@@ -3,11 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "next build",
-    "start": "NODE_ENV=production ts-node ./api/src/app.ts",
+    "build:next": "next build",
+    "build:server": "tsc --project tsconfig.server.json ",
+    "build": "pnpm run build:next && pnpm run build:server",
+    "start": "NODE_ENV=production node ./dist/app.js",
     "lint": "next lint",
-    "dev": "dotenv -e .env.development   nodemon ./api/src/app.ts",
-    "dev:start": "dotenv -e .env.development  ts-node ./api/src/app.ts",
+    "dev": "dotenv -e .env.development   nodemon ./server/src/app.ts",
+    "dev:start": "dotenv -e .env.production -- node ./dist/app.js",
     "test": "dotenv -e .env.test  -- jest -i ",
     "dprisma": "dotenv -e .env.development -- prisma   ",
     "migrate:test": "dotenv -e .env.test -- pnpm prisma migrate deploy"
