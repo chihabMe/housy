@@ -9,7 +9,7 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>app</title>
+        <title>app hello hi</title>
       </Head>
       <main className={styles.main}>hello</main>
     </>

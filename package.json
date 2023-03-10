@@ -4,12 +4,12 @@
   "private": true,
   "scripts": {
     "build": "next build",
-    "start": "next start",
+    "start": "NODE_ENV=production ts-node ./api/src/app.ts",
     "lint": "next lint",
-    "dev:api": "dotenv -e .env.development   nodemon ./api/src/app.ts",
-    "dev:next": "next dev",
+    "dev": "dotenv -e .env.development   nodemon ./api/src/app.ts",
+    "dev:start": "dotenv -e .env.development  ts-node ./api/src/app.ts",
     "test": "dotenv -e .env.test  -- jest -i ",
-    "prisma": "dotenv -e .env.development -- prisma   ",
+    "dprisma": "dotenv -e .env.development -- prisma   ",
     "migrate:test": "dotenv -e .env.test -- pnpm prisma migrate deploy"
   },
   "dependencies": {

@@ -29,10 +29,11 @@ export const setAuthCookies = ({
   access,
 }: {
   refresh: string;
-
   access: string;
   res: Response;
 }) => {
+  //@ts-ignore
   res.cookie(REFRESH_COOKIE_NAME, `Bearer ${refresh}`, refreshCookieOptions);
+  //@ts-ignore
   res.cookie(ACCESS_COOKIE_NAME, `Bearer ${access}`, accessCookieOptions);
 };
