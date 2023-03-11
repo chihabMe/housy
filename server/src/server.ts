@@ -8,6 +8,8 @@ import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import next from "next";
 import { parse } from "url";
+import { parseUrl } from "next/dist/shared/lib/router/utils/parse-url";
+import { ParsedUrlQuery } from "querystring";
 // import { promisify } from "util";
 // const readFilesAsync = promisify(readFile);
 
