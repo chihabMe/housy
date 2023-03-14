@@ -7,7 +7,7 @@
     "api:dev": "dotenv -e .env.development -- nodemon ./src/app.ts",
     "api:build": "tsc",
     "api:start": "node ./dist/app.js",
-    "api:test": "dotenv -e .env.test --jest"
+    "api:test": "dotenv -e .env.test -- jest"
   },
   "dependencies": {
     "bcrypt": "^5.1.0",
