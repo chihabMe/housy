@@ -1,6 +1,4 @@
-server/node_modules
-server/dist
-node_modules
-.next
-dist
 .env*
+node_modules
+dist/
+.next

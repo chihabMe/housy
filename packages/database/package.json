@@ -1,0 +1,24 @@
+{
+  "name": "database",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "types": "index.ts",
+  "scripts": {
+    "db:deploy": "dotenv -e .env.development -- pnpm prisma migrate deploy",
+    "db:migrate": "dotenv -e .env.development -- pnpm prisma migrate dev",
+    "db:generate": "dotenv -e .env.development -- pnpm prisma  generate",
+    "db:push": "dotenv -e .env.development -- pnpm prisma push --skip-migrate",
+    "db:migrate:test": "dotenv -e .env.test -- pnpm prisma migrate dev"
+  },
+  "dependencies": {
+    "@prisma/client": "^4.11.0",
+    "dotenv-cli": "^7.1.0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "prisma": "^4.11.0"
+  }
+}
