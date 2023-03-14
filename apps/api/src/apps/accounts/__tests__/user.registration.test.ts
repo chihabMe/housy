@@ -1,7 +1,7 @@
 import supertest from "supertest";
 import prisma from "../../../core/prisma";
 import { redis_client_connect } from "../../../core/redis_client";
-import { createServer } from "../../../server";
+import { createServer } from "../../../utils/server";
 import { findUserByEmailInterector } from "../accounts.interactors";
 
 const app = createServer();

@@ -6,7 +6,7 @@ import { hasher } from "../../../libs/hasher";
 import { extractAuthCookiesFromHeaders } from "../../../libs/helpers/headers.helpers";
 import sleep from "../../../libs/helpers/sleep";
 import jsonRepose from "../../../libs/jsonResponse";
-import { createServer } from "../../../server";
+import { createServer } from "../../../utils/server";
 import { createUserInteractor } from "../../accounts/accounts.interactors";
 
 const app = createServer();

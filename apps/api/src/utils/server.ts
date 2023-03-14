@@ -8,7 +8,7 @@ import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import { parse } from "url";
 
-export const createServer = () => {
+export const createServer = (): Express => {
   const app = express();
   registerMiddlewares(app);
   app.get("api/v1/hello", (req, res) => {

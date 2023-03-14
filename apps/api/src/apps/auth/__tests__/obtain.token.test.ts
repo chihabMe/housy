@@ -6,7 +6,7 @@ import {
 import prisma from "../../../core/prisma";
 import { redis_client_connect } from "../../../core/redis_client";
 import { hasher } from "../../../libs/hasher";
-import { createServer } from "../../../server";
+import { createServer } from "../../../utils/server";
 import {
   createUserInteractor,
   findUserByEmailInterector,
