@@ -7,7 +7,7 @@
     "api:dev": "dotenv -e .env.development -- nodemon ./src/app.ts",
     "api:build": "tsc",
     "build": "tsc",
-    "api:start": "node ./dist/app.js",
+    "api:start": "dotenv -e .env.production node ./dist/app.js",
     "start": "pnpm run api:start",
     "api:test": "dotenv -e .env.production -- jest"
   },

@@ -15,6 +15,9 @@
     "api:build": {
       "cache": false
     },
+    "api:start": {
+      "cache": false
+    },
     "web:build": {
       "cache": false
     }
