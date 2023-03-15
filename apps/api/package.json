@@ -8,7 +8,7 @@
     "api:build": "pnpm tsc",
     "build": "pnpm tsc",
     "api:start": "dotenv -e .env.production node ./dist/app.js",
-    "start": "pnpm run api:start",
+    "start": "NODE_ENV=production node ./dist/app.js",
     "api:test": "dotenv -e .env.production -- jest"
   },
   "dependencies": {
