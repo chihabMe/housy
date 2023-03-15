@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "api:dev": "dotenv -e .env.development -- nodemon ./src/app.ts",
-    "api:build": "tsc",
-    "build": "tsc",
+    "api:build": "pnpm tsc",
+    "build": "pnpm tsc",
     "api:start": "dotenv -e .env.production node ./dist/app.js",
     "start": "pnpm run api:start",
     "api:test": "dotenv -e .env.production -- jest"

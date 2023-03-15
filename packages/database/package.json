@@ -10,7 +10,7 @@
     "db:generate": "dotenv -e .env.development -- pnpm prisma  generate",
     "db:push": "dotenv -e .env.development -- pnpm prisma push --skip-migrate",
     "db:migrate:test": "dotenv -e .env.test -- pnpm prisma migrate dev",
-    "build": "tsc --build --verbose"
+    "build": "pnpm tsc --build --verbose"
   },
   "dependencies": {
     "@prisma/client": "^4.11.0",
