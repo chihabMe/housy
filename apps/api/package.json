@@ -14,6 +14,7 @@
   "dependencies": {
     "bcrypt": "^5.1.0",
     "cookie-parser": "^1.4.6",
+    "database": "workspace:*",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "http-status": "^1.6.2",
@@ -23,8 +24,8 @@
     "nodemon": "^2.0.20",
     "redis": "^4.6.4",
     "ts-node": "^10.9.1",
-    "zod": "^3.20.6",
-    "database": "workspace:*"
+    "typescipt": "^1.0.0",
+    "zod": "^3.20.6"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
