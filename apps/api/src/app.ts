@@ -10,5 +10,5 @@ const runServer = async () => {
   });
   return app;
 };
-if (require.main == module) runServer();
+// if (require.main == module) runServer();
 export default runServer();
