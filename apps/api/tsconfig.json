@@ -4,6 +4,8 @@
   "exclude": ["node_modules", "dist"],
   "compilerOptions": {
     "rootDir": "./src" /* Specify the root folder within your source files. */,
-    "outDir": "./dist" /* Specify an output folder for all emitted files. */
+    "outDir": "./dist" /* Specify an output folder for all emitted files. */,
+    "moduleResolution": "node",
+    "forceConsistentCasingInFileNames": true
   }
 }
