@@ -12,6 +12,7 @@
     "dev": {
       "cache": false
     },
+    "api:dev": { "cache": false },
     "api:build": {
       "cache": false
     },
