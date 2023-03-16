@@ -12,7 +12,7 @@
     "db:studio": "dotenv -e .env.development -- pnpm prisma studio",
     "db:studio:production": "dotenv -e .env.production -- pnpm prisma studio",
     "db:migrate:test": "dotenv -e .env.test -- pnpm prisma migrate dev",
-    "build": "pnpm db:migrate && pnpm tsc --build --verbose"
+    "build": "pnpm db:deploy && pnpm tsc --build --verbose"
   },
   "dependencies": {
     "@prisma/client": "^4.11.0",
