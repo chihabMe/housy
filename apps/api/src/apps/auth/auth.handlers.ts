@@ -11,7 +11,6 @@ import {
 import bcrypt from "bcrypt";
 import { findUserByEmailInterector } from "../accounts/accounts.interactors";
 import jsonRepose from "../../libs/jsonResponse";
-import sleep from "../../libs/helpers/sleep";
 
 export const obtainTokenHandler = async (
   req: Request<{}, {}, { email: string; password: string }>,
