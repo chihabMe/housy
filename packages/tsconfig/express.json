@@ -16,7 +16,8 @@
     "incremental": true,
     "module": "CommonJS",
     "resolveJsonModule": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "preserveWatchOutput": true
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"]
