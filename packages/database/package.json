@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "main": "./dist/index.js",
-  "types": "./src/index.ts",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "db:deploy": "dotenv -e .env.development -- pnpm prisma migrate deploy",
     "db:migrate": "dotenv -e .env.development -- pnpm prisma migrate dev",

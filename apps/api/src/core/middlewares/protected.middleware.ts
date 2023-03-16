@@ -1,4 +1,3 @@
-import { User } from "database";
 import { Request, Response, NextFunction } from "express";
 import httpStatus from "http-status";
 import { validateAccessToken } from "../../apps/auth/auth.services";
