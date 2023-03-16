@@ -10,6 +10,7 @@
     "db:generate": "dotenv -e .env.development -- pnpm prisma  generate",
     "db:push": "dotenv -e .env.development -- pnpm prisma push --skip-migrate",
     "db:studio": "dotenv -e .env.development -- pnpm prisma studio",
+    "db:studio:production": "dotenv -e .env.production -- pnpm prisma studio",
     "db:migrate:test": "dotenv -e .env.test -- pnpm prisma migrate dev",
     "build": "pnpm db:migrate && pnpm tsc --build --verbose"
   },

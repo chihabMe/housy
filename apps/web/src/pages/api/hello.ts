@@ -10,7 +10,7 @@ export default async function helloEndpoint(
     const users = await prisma.user.findMany();
     return res.status(200).json(users);
   } catch (er) {
-    console.error(err);
+    console.error(er);
     return res.status(400).json("error");
   }
 }
