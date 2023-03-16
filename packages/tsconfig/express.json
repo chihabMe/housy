@@ -5,13 +5,19 @@
     "declarationMap": false,
     "allowJs": false,
     "strict": true,
-    "module": "commonjs",
     "esModuleInterop": true,
     "target": "es6",
     "noImplicitAny": true,
     "moduleResolution": "node",
-    "sourceMap": true
+    "sourceMap": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "incremental": true,
+    "module": "CommonJS",
+    "resolveJsonModule": true,
+    "isolatedModules": true
   },
   "include": ["src"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "dist"]
 }
