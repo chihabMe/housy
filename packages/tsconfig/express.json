@@ -12,6 +12,7 @@
     "sourceMap": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
+    "incremental": true,
     "module": "CommonJS",
     "resolveJsonModule": true,
     "isolatedModules": true,
