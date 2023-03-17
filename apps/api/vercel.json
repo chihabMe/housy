@@ -1,4 +1,6 @@
 {
+  "installCommand": "pnpm install && pnpm db:migrate",
+  "buildCommand": "pnpm  api:build ",
   "version": 2,
   "builds": [
     {
@@ -12,6 +14,5 @@
       "src": "/(.*)",
       "dest": "src/app.ts"
     }
-  ],
-  "installCommand": "pnpm install && pnpm db:migrate"
+  ]
 }
