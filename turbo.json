@@ -11,6 +11,8 @@
       "outputs": []
     },
     "dev": {
+      "dependsOn": ["build"],
+      "outputs": ["dist/**", ".next/**"],
       "cache": false
     },
     "api:dev": { "cache": false },

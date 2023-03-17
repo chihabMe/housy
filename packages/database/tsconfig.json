@@ -1,16 +1,14 @@
 {
+  "display": "Default",
   "compilerOptions": {
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "isolatedModules": true,
     "moduleResolution": "node",
-    "preserveWatchOutput": true,
     "skipLibCheck": true,
-    "noEmit": true,
-    "strict": true,
+    "noEmit": false,
     "rootDir": "./src",
     "outDir": "./dist",
-    "composite": true
+    "composite": true,
+    "declarationMap": true,
+    "declaration": true
   },
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["node_modules"]
 }
