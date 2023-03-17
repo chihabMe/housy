@@ -12,5 +12,6 @@
       "src": "/(.*)",
       "dest": "src/app.ts"
     }
-  ]
+  ],
+  "installCommand": "pnpm install && pnpm db:migrate"
 }
