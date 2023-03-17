@@ -2,12 +2,13 @@
   "extends": "./base.json",
   "compilerOptions": {
     "target": "es5",
+    "forceConsistentCasingInFileNames": true,
+
     "allowJs": true,
     "skipLibCheck": true,
-    "strict": false,
     "incremental": true,
-    "forceConsistentCasingInFileNames": true,
-    "noEmitOnError": true,
+    "strict": true,
+
     "esModuleInterop": true,
     "declarationMap": true,
     "declaration": true,
@@ -16,7 +17,6 @@
     "isolatedModules": true,
     "module": "commonjs",
     "allowSyntheticDefaultImports": true,
-    "noImplicitAny": true,
     "sourceMap": true
   },
   "exclude": ["node_modules", "dist"],
