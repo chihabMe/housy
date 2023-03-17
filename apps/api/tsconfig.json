@@ -1,5 +1,5 @@
 {
-  "extends": "tsconfig/express.json",
+  "extends": "tsconfig/nextjs.json",
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "dist"],
   "compilerOptions": {
