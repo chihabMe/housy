@@ -16,7 +16,6 @@
     "isolatedModules": true,
     "module": "commonjs",
     "allowSyntheticDefaultImports": true,
-    "noEmit": false,
     "noImplicitAny": true,
     "sourceMap": true
   },
