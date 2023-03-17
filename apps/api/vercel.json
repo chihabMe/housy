@@ -1,6 +1,6 @@
 {
   "installCommand": "pnpm install && pnpm db:migrate",
-  "buildCommand": "pnpm  api:build ",
+  "buildCommand": "pnpm db:migrate &&pnpm  api:build ",
   "version": 2,
   "builds": [
     {
