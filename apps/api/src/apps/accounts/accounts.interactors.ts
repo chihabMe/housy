@@ -1,4 +1,4 @@
-import { User } from "database";
+import { User } from "@prisma/client";
 import prisma from "../../core/prisma";
 import { hasher } from "../../libs/hasher";
 

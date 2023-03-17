@@ -3,7 +3,7 @@ import { TypeOf } from "zod";
 import httpStatus from "http-status";
 import { hasher } from "../../libs/hasher";
 import crypto from "crypto";
-import { User } from "database";
+import { User } from "@prisma/client";
 import { sendAccountActivationEmail, sendMail } from "../../libs/email";
 import redis_client from "../../core/redis_client";
 import {

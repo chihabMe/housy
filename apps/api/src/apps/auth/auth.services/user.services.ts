@@ -1,2 +1,2 @@
-import { User } from "database";
+import { User } from "@prisma/client";
 import bcrypt from "bcrypt";
