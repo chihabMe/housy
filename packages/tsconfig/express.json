@@ -1,17 +1,25 @@
 {
   "extends": "./base.json",
   "compilerOptions": {
-    "declaration": false,
-    "declarationMap": false,
-    "allowJs": false,
-    "strict": true,
-    "module": "commonjs",
+    "target": "es5",
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "incremental": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmitOnError": true,
     "esModuleInterop": true,
-    "target": "es6",
-    "noImplicitAny": true,
+    "declarationMap": true,
+    "declaration": true,
     "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "module": "commonjs",
+    "allowSyntheticDefaultImports": true,
+    "noEmit": false,
+    "noImplicitAny": true,
     "sourceMap": true
   },
-  "include": ["src"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "dist"],
+  "include": ["src/**/*.ts"]
 }
