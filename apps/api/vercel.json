@@ -1,14 +1,3 @@
 {
-  "version": 2,
-  "public": true,
-  "routes": [
-    {
-      "src": "/robots.txt",
-      "status": 204
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/src/app.ts"
-    }
-  ]
+  "rewrites": [{ "source": "/(.*)", "destination": "./dist/app.js" }]
 }
