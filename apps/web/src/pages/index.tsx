@@ -12,9 +12,7 @@ export default function Web({ data }: { data: string }) {
 }
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   try {
-    console.log(helloEndpoint);
     const response = await fetch(helloEndpoint);
-    console.log(response);
     const data: string = await response.json();
     return {
       props: {

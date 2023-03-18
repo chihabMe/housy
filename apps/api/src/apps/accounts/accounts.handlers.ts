@@ -66,9 +66,13 @@ export const accountsRegisterHandler = async (
         html: generateActivationEmail({ activationURI }),
         to: email,
       });
-    } catch (err) {}
+    } catch (err) {
+      console.log("can't send an email");
+    }
     //to store the use for asking many activation links in a short time
-    await storeThatThisUserAskedForAToken(user.id);
+    // await storeThatThisUserAskedForAToken(user.id);
+    storeThatThisUserAskedForAToken(user.id);
+
     //return success status and the user data
     res.status(httpStatus.CREATED).json(
       jsonRepose.success({
@@ -77,6 +81,7 @@ export const accountsRegisterHandler = async (
     );
   } catch (err) {
     //pass the error to the 500 errors handler middleware
+
     next(err);
   }
 };
@@ -146,9 +151,11 @@ export const accountsActivateHandler = async (
     //delete the activationToken
     await deleteTokenById(token.id);
     //return success response
+    // activated successfully
+    return res.redirect("http://localhost:3000/accounts/activate-success");
     return res
       .status(httpStatus.OK)
-      .json(jsonRepose.success({ message: "activated" }));
+      .json(jsonRepose.success({ message: "activated please try to login" }));
   } catch (err) {
     next(err);
   }
