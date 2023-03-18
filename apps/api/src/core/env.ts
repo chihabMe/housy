@@ -28,10 +28,12 @@ export const getRedisURL = () => {
   const port = process.env.REDIS_PORT;
   const password = process.env.REDIS_PASSWORD;
   const username = process.env.REDIS_USERNAME;
-  if (!isProduction()) return `redis://:@localhost:6379`;
   if (!host || !port || !password || !username)
     throw new Error("please check your redis env variables");
-  return `redis://${username}:${password}@${host}:${port}`;
+
+  const url = `redis://${username}:${password}@${host}:${port}`;
+  console.log(url);
+  return url;
 };
 const getEmailConfig = () => {
   const host = process.env.EMAIL_HOST;
