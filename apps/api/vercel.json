@@ -1,14 +1,6 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "installCommand": "pnpm install && pnpm db:migrate",
-      "buildCommand": "pnpm db:migrate &&pnpm  api:build ",
-      "src": "src/app.ts",
-      "use": "@vercel/node",
-      "config": { "includeFiles": ["dist/**"] }
-    }
-  ],
+
   "routes": [
     {
       "src": "/(.*)",
