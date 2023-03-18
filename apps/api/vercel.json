@@ -3,7 +3,6 @@
   "buildCommand": "pnpm db:migrate && npm api:build",
   "builds": [
     {
-      "buildCommand": "pnpm db:migrate && npm api:build",
       "src": "dist/app.js",
       "use": "@vercel/node",
       "config": {
