@@ -3,10 +3,5 @@
   "buildCommand": "pnpm db:migrate && pnpm api:build",
   "installCommand": "pnpm install && pnpm db:migrate",
 
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "dist/app.js"
-    }
-  ]
+  "rewrites": [{ "source": "/(.*)", "destination": "/dist/app.js" }]
 }
