@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "pnpm db:migrate && npm api:build",
+  "buildCommand": "pnpm db:migrate && pnpm api:build",
   "installCommand": "pnpm install && pnpm db:migrate",
 
   "routes": [
