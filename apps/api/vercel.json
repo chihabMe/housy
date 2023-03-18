@@ -1,7 +1,17 @@
 {
   "version": 2,
-  "buildCommand": "pnpm db:migrate && pnpm api:build",
+  "buildCommand": "pnpm db:migrate && npm api:build",
   "installCommand": "pnpm install && pnpm db:migrate",
-
-  "rewrites": [{ "source": "/(.*)", "destination": "/dist/app.js" }]
+  "builds": [
+    {
+      "src": "src/app.ts",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "src/app.ts"
+    }
+  ]
 }
