@@ -7,6 +7,7 @@ import _500 from "../core/middlewares/500.middleware";
 import cookieParser from "cookie-parser";
 import morgan from "morgan";
 import { parse } from "url";
+import helmet from "helmet";
 
 export const createServer = (): Express => {
   const app = express();
@@ -25,6 +26,7 @@ const registerApps = (app: Express) => {
   app.use("/api/v1/accounts", accountsRouter);
 };
 const registerMiddlewares = (app: Express) => {
+  app.use(helmet());
   app.use(morgan("dev"));
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
