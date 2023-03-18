@@ -2,18 +2,7 @@
   "version": 2,
   "buildCommand": "pnpm db:migrate && npm api:build",
   "installCommand": "pnpm install && pnpm db:migrate",
-  "builds": [
-    {
-      "src": "dist/app.js",
-      "use": "@vercel/node",
-      "config": {
-        "includeFiles": ["dist/**"],
 
-        "installCommand": "pnpm install && pnpm db:migrate"
-      },
-      "installCommand": "pnpm install && pnpm db:migrate"
-    }
-  ],
   "routes": [
     {
       "src": "/(.*)",
