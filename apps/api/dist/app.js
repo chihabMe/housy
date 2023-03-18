@@ -16,12 +16,18 @@ const env_1 = __importDefault(require("./core/env"));
 const redis_client_1 = require("./core/redis_client");
 const server_1 = require("./utils/server");
 const runServer = () => __awaiter(void 0, void 0, void 0, function* () {
-    const app = (0, server_1.createServer)();
-    yield (0, redis_client_1.redis_client_connect)();
-    app.listen(env_1.default.PORT, () => {
-        console.log(`running the server on port ${env_1.default.PORT}`);
-    });
-    return app;
+    try {
+        const app = (0, server_1.createServer)();
+        yield (0, redis_client_1.redis_client_connect)();
+        app.listen(env_1.default.PORT, () => {
+            console.log(`running the server on port ${env_1.default.PORT}`);
+        });
+        return app;
+    }
+    catch (err) {
+        console.error(err);
+        process.exit(1);
+    }
 });
 // if (require.main == module) runServer();
 exports.default = runServer();

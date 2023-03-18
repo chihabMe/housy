@@ -31,9 +31,8 @@ export const getRedisURL = () => {
   if (!host || !port || !password || !username)
     throw new Error("please check your redis env variables");
 
-  const url = `redis://${username}:${password}@${host}:${port}`;
-  console.log(url);
-  return url;
+  if (isProduction()) return `rediss://${username}:${password}@${host}:${port}`;
+  return `redis://${username}:${password}@${host}:${port}`;
 };
 const getEmailConfig = () => {
   const host = process.env.EMAIL_HOST;

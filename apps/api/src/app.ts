@@ -12,6 +12,7 @@ const runServer = async () => {
     return app;
   } catch (err) {
     console.error(err);
+    console.log("exit");
     process.exit(1);
   }
 };

@@ -32,11 +32,11 @@ const getRedisURL = () => {
     const port = process.env.REDIS_PORT;
     const password = process.env.REDIS_PASSWORD;
     const username = process.env.REDIS_USERNAME;
-    if (!isProduction())
-        return `redis://:@localhost:6379`;
     if (!host || !port || !password || !username)
         throw new Error("please check your redis env variables");
-    return `redis://${username}:${password}@${host}:${port}`;
+    return "redis://default:6f626ea12baa43bcb71bfd4af820ec9f@eu2-ethical-kid-31943.upstash.io:31943";
+    const url = `redis://${username}:${password}@${host}:${port}`;
+    return url;
 };
 exports.getRedisURL = getRedisURL;
 const getEmailConfig = () => {

@@ -19,13 +19,15 @@ const redis_client = (0, redis_1.createClient)({
     url: env_1.default.getRedisURL(),
 });
 const redis_client_connect = () => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(env_1.default.getRedisURL());
     try {
+        console.log();
         yield redis_client.connect();
         console.log("redis is connected");
     }
     catch (err) {
         console.log("unable to connect with redis");
-        throw err;
+        console.error(err);
     }
 });
 exports.redis_client_connect = redis_client_connect;
