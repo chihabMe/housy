@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "include": ["api/**/*.ts"],
+  "exclude": ["node_modules", "dist", ".next"],
+  "compilerOptions": {
+    "rootDir": "./api" /* Specify the root folder within your source files. */,
+    "outDir": "./dist" /* Specify an output folder for all emitted files. */,
+    "noEmit": false,
+    "target": "ES6",
+    "module": "CommonJS"
+  }
+}

@@ -11,18 +11,12 @@
       "outputs": []
     },
     "dev": {
-      "dependsOn": ["build"],
-      "outputs": ["dist/**", ".next/**"],
       "cache": false
     },
-    "api:dev": { "cache": false },
-    "api:build": {
+    "db:init": {
       "cache": false
     },
-    "api:start": {
-      "cache": false
-    },
-    "web:build": {
+    "db:migrate": {
       "cache": false
     }
   }

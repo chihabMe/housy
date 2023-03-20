@@ -1,0 +1,5 @@
+{
+  "watch": ["api"],
+  "exclude": [".next", "dist"],
+  "exec": "ts-node --project tsconfig.api.json api/app.ts"
+}

@@ -12,6 +12,7 @@
     "db:studio": "dotenv -e .env.development -- pnpm prisma studio",
     "db:studio:production": "dotenv -e .env.production -- pnpm prisma studio",
     "db:migrate:test": "dotenv -e .env.test -- pnpm prisma migrate dev",
+    "db:init": "pnpm db:deploy && pnpm db:generate",
     "build": "pnpm db:deploy && pnpm tsc "
   },
   "dependencies": {
