@@ -11,7 +11,7 @@ export default function Web({ data }: { data: string }) {
 }
 export const getServerSideProps: GetServerSideProps = async (ctx) => {
   try {
-    const response = await fetch("http://localhost:3001/api/v1/hello");
+    const response = await fetch("http://localhost:3000/api/v1/hello");
     const data: string = await response.json();
     console.log(data, response.status);
     return {

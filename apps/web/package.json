@@ -7,6 +7,7 @@
     "build:next": "pnpm next build",
     "build:api": "pnpm tsc --project tsconfig.api.json",
     "build": "pnpm build:api && pnpm run build:next ",
+    "start:build": "pnpm dotenv -e .env.development -- node ./dist/app.js",
     "test:api": "dotenv -e .env.test -- jest",
     "start": "NODE_ENV=production node ./dist/api/app.js",
     "lint": "next lint"

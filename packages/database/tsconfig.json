@@ -6,9 +6,15 @@
     "noEmit": false,
     "rootDir": "./src",
     "outDir": "./dist",
+    "declarationDir": "./types",
     "composite": true,
+    "declaration": true,
     "declarationMap": true,
-    "declaration": true
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "preserveWatchOutput": true,
+    "strict": true
   },
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "./types", "./dist"]
 }

@@ -22,7 +22,7 @@ export const createServer = async () => {
     registerApps(app);
     app.get("*", async (req, res) => {
       const url = parse(req.url, true);
-      return await handle(req, res, url);
+      await handle(req, res, url);
     });
     registerErrorsMiddlewares(app);
   });
